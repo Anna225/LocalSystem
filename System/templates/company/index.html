@@ -1,0 +1,150 @@
+{% extends 'basic.html' %}
+{% block style %}
+    {% load static %}
+    <!-- Sweetalert Css -->
+    <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Basic Examples -->
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="header">
+                        <a class="btn btn-primary" href="{% url 'companyadd' %}">AÑADIR Empresa</a>
+                        <h2 style="padding-top:12px;">Empresa</h2>
+                    </div>
+                    <div class="card" style="padding: 10px;">
+                        <div class="col-lg-2" style="padding: 10px;">
+                            <input id="search_company" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                        </div>
+                        
+                        <table class="table color-table primary-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nombre de Empresa</th>
+                                    <th scope="col">Dirección</th>
+                                    <th scope="col">Teléfono</th>
+                                    <th scope="col">Sitio web</th>
+                                    <th scope="col">NIF</th>
+                                    <th scope="col">País</th>
+                                    <th scope="col">Note</th>
+                                    <th scope="col" class="text-center">Modificar</th>
+                                </tr>
+                            </thead>
+                            <tbody>	
+                            {% if companies %}	
+                                {% for company in companies %}
+                                <tr class="text-left">
+                                    <td class="text-left">{{company.name}}</td>
+                                    <td class="text-left">{{company.address}}</td>
+                                    <td class="text-left">{{company.phone}}</td>
+                                    <td class="text-left">{{company.web}}</td>
+                                    <td class="text-left">{{company.nif}}</td>
+                                    <td class="text-left">{{company.country_company.name}}</td> 
+                                    <td class="text-left">{{company.description|truncatechars:10}}</td>                                   
+                                    
+                                    <td class="text-center" style="vertical-align: middle">
+                                        <a href="{% url 'companyupdate' company.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
+                                        <a href="#" data-toggle="modal" data-target="#delete-company{{company.id}}"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                                <!--Delete Company-->
+								<div class="modal fade" id="delete-company{{company.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+									<div class="modal-dialog modal-xs">
+										<div class="modal-content" style="border-radius: 15px;">
+											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+												<div class="align-items-center">
+													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR Empresa</p>
+												</div>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true" style="color: #fff;">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												<div class="col-12">
+													<h5>¿Está seguro que quiere eliminar este registro?</h5>
+												</div>
+											</div>
+											<div class="modal-footer">
+                                                <center>
+                                                    <button id="delete-button{{company.id}}" class="btn btn-primary">SI</button>
+                                                    <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                </center>
+											</div>
+										</div>
+									</div>
+								</div>
+								<script>
+									$('#delete-button{{company.id}}').click(function(e){
+										var value = '{{company.id}}';
+										var url = '{% url "delete_company" %}';
+										var token = '{{csrf_token}}';
+										$.ajax({
+											headers: { "X-CSRFToken": token },
+											method: 'POST',
+											url: url,
+											data: {
+												'value': value
+											},
+											success: function(data) {
+												if(data == 'Ok') {
+													location.reload();
+												}
+											}
+										});
+									});
+								</script>
+                                {% endfor %}
+                            {% else %}
+                                <td style="padding-bottom:30px;">No existen Empresa</td>
+							{% endif %}
+                            </tbody>
+                        </table>
+                        <script>
+                            $("#search_company").keyup(function(){
+                                _this = this;
+                                // Show only matching TR, hide rest of them
+                                $.each($("table tbody tr"), function() {
+                                    if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1){
+                                        $(this).hide();
+                                    }
+                                    else {
+                                        $(this).show();
+                                    }
+                                });
+                            });
+			            </script>
+                    </div>
+                    {% if companies.has_other_pages %}
+                        <center>
+                            <ul class="pagination text-center">
+                                {% if companies.has_previous %}
+                                    <li><a href="?page={{ companies.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in companies.paginator.page_range %}
+                                    {% if companies.number == i %}
+                                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if companies.has_next %}
+                                    <li><a href="?page={{ companies.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                        </center>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+{% endblock %}
