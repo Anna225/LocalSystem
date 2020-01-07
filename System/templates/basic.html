@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css?family=Aguafina+Script&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Lobster&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     {% load static %}
     <link rel="icon" href="{% static 'theme/favicon.ico' %}" type="image/x-icon">
     <!-- Bootstrap Core Css -->
@@ -68,6 +69,7 @@
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="nav navbar-nav navbar-right" style="padding-right:100px;">
                 {% if user.is_authenticated %}
+                    <li><img style="width: 35px; display: inline-block; margin-right: 20px; margin-top: 17px; border-radius: 50%;" src="{% static 'images/avatar-default.jpg'%}"></li>
                     <li><a href="javascript:void(0);" class="navbar-brand">Hola &nbsp;{{user.username}}</a></li>
                     <li><a href="{% url 'logout_delete' %}"><i class="material-icons">input</i></a></li>
                 {% endif %}
