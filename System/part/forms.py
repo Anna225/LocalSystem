@@ -49,7 +49,7 @@ class SupplierForm(forms.ModelForm):
 class SpensesForm(forms.ModelForm):
     class Meta:
         model = Spenses
-        fields = ('amount', 'date', 'company', 'supplier', 'file')
+        fields = ('amount', 'date', 'company', 'supplier', 'file', 'iva')
         widgets = {
             'amount': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'amount', 'id':'amount', 'required':True}),
             'file': forms.FileInput(attrs={'class':'custom-file-input'}),

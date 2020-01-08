@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from System.part.models import Company, Supplier, Spenses
+from System.part.models import Company, Supplier, Spenses, IVA
 from cities_light.models import Country
 import os
 
@@ -239,9 +239,11 @@ class spensesadd(CreateView):
         context = super(spensesadd, self).get_context_data(**kwargs)
         company = Company.objects.all()
         supplier = Supplier.objects.all()
+        iva = IVA.objects.all()
 
         context["companys"] = company
         context["suppliers"] = supplier
+        context["ivas"] = iva
         return context
 
 @method_decorator(login_required, name='dispatch')

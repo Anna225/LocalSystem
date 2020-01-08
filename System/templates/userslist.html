@@ -40,10 +40,17 @@
                                         <td class="bg-gray badge">Administración</td>
                                     {% else %}
                                         <td class="text-left">Usuario</td>
-                                    {% endif %}   
-                                    <td class="text-center" style="vertical-align: middle">
-                                        <a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a>
-                                    </td>
+                                    {% endif %}
+                                    {% if user.is_staff == True %}   
+                                        <td class="text-center" style="vertical-align: middle">
+                                            <!--a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a-->
+                                        </td>
+                                    {% else %}
+                                        <td class="text-center" style="vertical-align: middle">
+                                            <!--a href="{% url 'change_password' user.id %}"><i class="fa fa-pencil"></i></a-->&nbsp;
+                                            <a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                                 <!--Delete Users-->
 								<div class="modal fade" id="delete-user{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">

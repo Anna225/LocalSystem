@@ -113,7 +113,7 @@
                         <span>List of spenses</span>
                     </a>
                 </li> 
-                {% if user.is_staff %}
+                {% if request.user.is_staff %}
                     <li class="{% if 'userlist' in request.path %}active{% endif %}">
                         <a href="{% url 'userlist' %}"><i class="material-icons">person</i>
                             <span>Usuario</span>
