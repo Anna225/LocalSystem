@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from System.part import views as part_view
-from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update
+from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist
 from .views import companyupdate, supplierupdate, spensesupdate
 
 from django.contrib.auth.views import PasswordResetView 
@@ -24,8 +24,9 @@ urlpatterns = [
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
     path('signup/', part_view.register, name='signup'),
     url(r'^index/$', index.as_view(), name='index'),
-    url(r'^companyaddindex/$', companyadd.as_view(), name='companyadd'),
-    url(r'^companyupdateindex/(?P<pk>\d+)/$', companyupdate.as_view(), name='companyupdate'),
+    url(r'^companylist/$', companylist.as_view(), name='companylist'),
+    url(r'^companyadd/$', companyadd.as_view(), name='companyadd'),
+    url(r'^companyupdate/(?P<pk>\d+)/$', companyupdate.as_view(), name='companyupdate'),
     url(r'^delete_company/$', part_view.delete_company, name='delete_company'),
     path('supplier/', part_view.supplier, name='supplier'),
     url(r'^supplieradd/$', supplieradd.as_view(), name='supplieradd'),

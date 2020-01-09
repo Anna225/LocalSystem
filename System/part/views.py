@@ -87,10 +87,26 @@ def register(request):
 class index(ListView):
     model = Company
     fields = "__all__"
-    template_name = "company/index.html"
+    template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super(index, self).get_context_data(**kwargs)
+        company = Company.objects.all().count()
+        supplier = Supplier.objects.all().count()
+        
+        context["company_num"] = company
+        context["supplier_num"] = supplier
+        
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class companylist(ListView):
+    model = Company
+    fields = "__all__"
+    template_name = "company/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(companylist, self).get_context_data(**kwargs)
         company = Company.objects.all().order_by('name')
         paginator = Paginator(company, 10)
         page = self.request.GET.get('page')
@@ -137,14 +153,14 @@ class companyadd(CreateView):
             )
             company.save()
         
-        return redirect('index')
+        return redirect('companylist')
 
 @method_decorator(login_required, name='dispatch')
 class companyupdate(UpdateView):
     model = Company
     form_class = CompanyForm
     template_name = "company/update_company.html"
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('companylist')
 
 @login_required
 def supplier(request):

@@ -9,8 +9,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="header">
-                <a class="btn btn-primary" href="">AÑADIR Categorie</a>
-                <h2>Categorie</h2>
+                <h2>HOME</h2>
             </div>
             <!-- Basic Examples -->
             <div class="row clearfix">
@@ -18,74 +17,62 @@
                     <div class="card">
                         <div class="body">
                             <div class="list-unstyled row clearfix">
-                                <h3 class="text-center">Company</h3>
+                                <h3 class="text-center">EMPRESA</h3>
                                 <center>
-                                    <a href="{% url 'index' %}">
+                                    <a href="{% url 'companylist' %}">
                                         <i class="material-icons" style="font-size:100px;">business_center</i>    
                                     </a>
                                 </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">New</button>
-                                </div>
+                                <h4 class="text-center">{{company_num}}</h4>
+                                <h4 class="text-center">Nuestras empresas</h4>
                             </div>
                         </div>   
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
                     <div class="card">
-                        <div class="body" style="padding: 20px 60px">
+                        <div class="body">
                             <div class="list-unstyled row clearfix">
-                                <h3 class="text-center">Company</h3>
+                                <h3 class="text-center">SUPPLIER</h3>
                                 <center>
-                                    <a href="{% url 'index' %}">
+                                    <a href="{% url 'supplier' %}">
                                         <i class="material-icons" style="font-size:100px;">public</i>    
                                     </a>
                                 </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">Petrol</button>
-                                </div>
+                                <h4 class="text-center">{{supplier_num}}</h4>
+                                <h4 class="text-center">Nuestros proveedores</h4>
                             </div>
                         </div>   
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
                     <div class="card">
-                        <div class="body" style="padding: 20px 60px">
+                        <div class="body">
                             <div class="list-unstyled row clearfix">
-                            <h3 class="text-center">Company</h3>
+                            <h3 class="text-center">CATEGORIE</h3>
                                 <center>
-                                    <a href="{% url 'index' %}">
+                                    <a href="{% url 'Categorie' %}">
                                         <i class="material-icons" style="font-size:100px;">bookmark_border</i>    
                                     </a>
                                 </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">Informatic</button>
-                                </div>
+                                <h4 class="text-center">1</h4>
+                                <h4 class="text-center">Nuestras categorías</h4>
                             </div>
                         </div>   
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
                     <div class="card">
-                        <div class="body" style="padding: 20px 60px">
+                        <div class="body">
                             <div class="list-unstyled row clearfix">
-                            <h3 class="text-center">Company</h3>
+                            <h3 class="text-center">DATOS PERSONALES</h3>
                                 <center>
-                                    <a href="{% url 'index' %}">
+                                    <a href="{% url 'userinformation' request.user.id %}">
                                         <i class="material-icons" style="font-size:100px;">contacts</i>    
                                     </a>
                                 </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">Telephone</button>
-                                </div>
+                                <h4 class="text-center">{{user.username}}</h4>
+                                <h4 class="text-center">{{user.email}}</h4>
                             </div>
                         </div>   
                     </div>

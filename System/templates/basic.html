@@ -88,11 +88,18 @@
         <!-- Menu -->
         <div class="menu" style="padding: 10px;">
             <ul class="list">
-                
                 <li class="{% if 'index' in request.path %}
                     active
                 {% endif %}">
                     <a href="{% url 'index' %}">
+                        <i class="material-icons">desktop_mac</i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="{% if 'company' in request.path %}
+                    active
+                {% endif %}">
+                    <a href="{% url 'companylist' %}">
                         <i class="material-icons">business_center</i>
                         <span>Empresa</span>
                     </a>
