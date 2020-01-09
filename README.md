@@ -44,11 +44,11 @@ prerequisitos
 
     cd LocalSystem
 
-2. Instalar dependencias con pip. (Si estas usando entorno virtual recuerda activarlo)
+2.Instalar dependencias con pip. (Si estas usando entorno virtual recuerda activarlo)
 
     pip install -r requirements.txt
 
-4.Realizar las migraciones
+3.Realizar las migraciones
 
     python manage.py makemigrations
 
@@ -66,7 +66,7 @@ prerequisitos
 
     python manage.py cities_light --force-all
 
-5.Correr el proyecto:
+4.Correr el proyecto:
 
     python manage.py runserver
 
