@@ -1,9 +1,13 @@
 from django.db import models
-from cities_light.models import Country
+from cities_light.models import Country, City
+from django.contrib.auth.models import AbstractUser 
 # Create your models here.
 
 def invoice_file(instance, filename):
     return 'invoice/{1}'.format(instance, filename)
+
+def content_file_user(instance, filename):
+    return 'usercustom/{1}'.format(instance, filename)
 
 class Company(models.Model):
     name = models.CharField(max_length=50, blank=True)
@@ -17,6 +21,12 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+class IVA(models.Model):
+    name = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return self.name
+
 class Supplier(models.Model):
     name = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=16, blank=True, null=True)
@@ -25,15 +35,11 @@ class Supplier(models.Model):
     nif = models.CharField(max_length=50, blank=True)
     country_supplier = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True)
+    iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
-class IVA(models.Model):
-    name = models.CharField(max_length=50, blank=True)
-
-    def __str__(self):
-        return self.name
 
 class Spenses(models.Model):
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
@@ -45,5 +51,21 @@ class Spenses(models.Model):
 
     def __str__(self):
         return self.amount
+
+class User(AbstractUser):
+    picture = models.ImageField(upload_to=content_file_user, blank=True)
+    telephone = models.IntegerField(blank=True, null=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=True, null=True)    
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=True, null=True)
+    company = models.ForeignKey(Company, related_name='user_relationship',on_delete=models.SET_NULL, blank=True, null=True)
+    movil = models.CharField(max_length=30, blank=True, null=True)
+    wechat = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(unique=True, blank=True, null=True)
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        permissions = (("admin_user","Can use modules admin"),("guest_user","Can use modules guest"))
 
 

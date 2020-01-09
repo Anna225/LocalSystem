@@ -42,7 +42,7 @@
                                     <td><i class="fa fa-calendar"></i>&nbsp;{{spense.date|date:"Y-m-d"}}</td>
                                     <td>{{spense.iva.name}}</td>
                                     {% if spense.file %}
-                                        <td class="align-middle"><a href="{{spense.file.url}}" target="_blank"><i class="fa fa-file-pdf-o"></i>&nbsp;{{spense.file}}</a></td>            
+                                        <td class="align-middle"><a href="{{spense.file.url}}" target="_blank"><i class="fa fa-file-pdf-o"></i>&nbsp;{{spense.file|truncatechars:35}}</a></td>            
                                     {% else %}
                                         <td class="align-middle"></td> 
                                     {% endif %}

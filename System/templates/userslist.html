@@ -24,6 +24,7 @@
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Apellido</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Imagen</th>
                                     <th scope="col">Papel</th>
                                     <th scope="col" class="text-center">Modificar</th>
                                 </tr>
@@ -36,6 +37,11 @@
                                     <td class="text-left">{{user.first_name}}</td>
                                     <td class="text-left">{{user.last_name}}</td>
                                     <td class="text-left"><i class="fa fa-envelope-o"></i>&nbsp;{{user.email}}</td>
+                                    {% if user.picture %}
+                                        <td><img src="{{user.picture.url}}" style="width: 40px; display: inline-block; border-radius: 50%;"></td>
+                                    {% else %}
+                                        <td><img style="width: 40px; display: inline-block; border-radius: 50%;" src="{% static 'images/avatar-default.jpg'%}"></td>
+                                    {% endif %}
                                     {% if user.is_staff == True %}
                                         <td class="bg-gray badge">Administración</td>
                                     {% else %}

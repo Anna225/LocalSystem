@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from System.part import views as part_view
-from .views import companyadd, supplieradd, spensesadd, userlist, index
+from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update
 from .views import companyupdate, supplierupdate, spensesupdate
 
 from django.contrib.auth.views import PasswordResetView 
@@ -14,12 +14,14 @@ from django.contrib.auth.views import PasswordResetConfirmView
 from django.contrib.auth.views import PasswordResetCompleteView
 from django.contrib.auth.views import PasswordChangeView
 
+from .views import LoginView
+from .views import LogoutView
+
 urlpatterns = [
 
     path('', part_view.home, name='home' ),
-    path('login/', auth_views.LoginView.as_view(template_name = 'login_page.html'), name='login'),
-    path('logout_delete', part_view.deleteDirectory, name='logout_delete'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='login_page.html'), name='logout'),
+    url(r'^login/$', LoginView.as_view(), name='login'),
+    url(r'^logout/$', LogoutView.as_view(), name='logout'),
     path('signup/', part_view.register, name='signup'),
     url(r'^index/$', index.as_view(), name='index'),
     url(r'^companyaddindex/$', companyadd.as_view(), name='companyadd'),
@@ -35,12 +37,13 @@ urlpatterns = [
     url(r'^delete_spense/$', part_view.delete_spense, name='delete_spense'),
     path('Categorie/', part_view.Categorie, name='Categorie'),
     url(r'^userlist/$', userlist.as_view(), name='userlist'),
-    #url(r'^useradd/$', useradd.as_view(), name='useradd'),
     url(r'^delete_user/$', part_view.delete_user, name='delete_user'),
     url(r'^reset/password/$', PasswordResetView.as_view(template_name='password_reset_form.html', email_template_name='password_reset_email.html'), name='password_reset'),
     url(r'^reset/password/reset/done/$', PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     url(r'^reset/done/$', PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
     url(r'^change/password/(?P<pk>[0-9]+)/$', PasswordChangeView.as_view(template_name='password_change.html', success_url='/'), name='change_password'),
+    url(r'^personallist/(?P<pk>\d+)/$', userinformation.as_view(), name='userinformation'),
+    url(r'^personallist_update/(?P<pk>\d+)/$', userinformation_update.as_view(), name='userinformation_update'),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

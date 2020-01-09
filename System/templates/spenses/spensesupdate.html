@@ -82,7 +82,7 @@
                                             <div class="custom-file">
                                             {% if file %}
                                                 {% if file.file != "" %}
-                                                    <label id="pdf-file-input" class="custom-file-label" for="file">{{file.file}}</label>
+                                                    <label id="pdf-file-input" class="custom-file-label" for="file">{{file.file|truncatechars:50}}</label>
                                                     <input type='file' class='custom-file-input' id='invoice' name='file' />
                                                 {% else %}
                                                     <label id="pdf-file-input" class="custom-file-label" for="file"><i class="fa fa-file"></i>&nbsp;&nbsp;Añadir Factura</label>

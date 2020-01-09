@@ -62,6 +62,7 @@ prerequisitos
     python manage.py migrate
     
     python manage.py loaddata System/part/data/users.json
+    python manage.py loaddata System/part/data/ivas.json
 
     python manage.py cities_light --force-all
 

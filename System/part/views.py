@@ -1,8 +1,8 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import User
+from System.part.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from System.part.models import Company, Supplier, Spenses, IVA
@@ -13,26 +13,43 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from django.urls import reverse, reverse_lazy
-from System.part.forms import CompanyForm, SupplierForm, SpensesForm
+from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm
 
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.contrib.auth.forms import AuthenticationForm
+from django.views.generic import FormView, RedirectView
 
 # Create your views here.
 
 def home(request):
     return redirect('login')
 
-def my_login_view(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
+class LoginView(FormView):
+    form_class = AuthenticationForm
+    template_name = "login_page.html"
     
-    if user is not None:
-        login(request, user)
-    else:
-        pass
+    def get_success_url(self):
+        return reverse_lazy("index")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return super(LoginView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+
+        return super(LoginView, self).form_valid(form)
+
+class LogoutView(RedirectView):
+    url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super(LogoutView, self).get(request, *args, **kwargs)
 
 # Register Function
 def register(request):
@@ -176,7 +193,9 @@ class supplieradd(CreateView):
     def get_context_data(self, **kwargs):
         context = super(supplieradd, self).get_context_data(**kwargs)
         country = Country.objects.all()
+        iva = IVA.objects.all()
         context["countrys"] = country
+        context["ivas"] = iva
         return context
 
     def post(self, request, *args, **kwargs):
@@ -188,7 +207,7 @@ class supplieradd(CreateView):
             nif = request.POST.get('nif')
             countries = request.POST.get('country')
             description = request.POST.get('description')
-
+            iva = request.POST.get('iva')
             supplier = Supplier(
                 name = name,
                 phone = phone,
@@ -197,6 +216,7 @@ class supplieradd(CreateView):
                 nif=nif,
                 country_supplier_id=countries,
                 description=description,
+                iva_id=iva,
             )
             supplier.save()
         
@@ -263,6 +283,30 @@ def Categorie(request):
     country = Country.objects.all()
     return render(request, 'category/Categorie.html', {'country':country})
 
-def deleteDirectory(request):
+@method_decorator(login_required, name='dispatch')
+class userinformation(ListView):
+    model = User
+    fields = '__all__'
+    template_name = "personal/personallist.html"
+    success_url = reverse_lazy('userinformation_update')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = User.objects.get(pk=self.kwargs.get('pk'))
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class userinformation_update(UpdateView):
     
-    return redirect('logout')
+    model = User
+    form_class = UserForm
+    template_name = "personal/personallist_update.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = User.objects.get(pk=self.kwargs.get('pk'))
+        return context
+
+    def get_success_url(self):
+        return reverse('userinformation', kwargs={'pk': self.object.pk})
+

@@ -1,6 +1,7 @@
 from django import forms
 from System.part.models import Company, Supplier, Spenses
 from cities_light.models import Country
+from System.part.models import User
 
 class CompanyForm(forms.ModelForm):
     class Meta:
@@ -35,7 +36,8 @@ class SupplierForm(forms.ModelForm):
             'web',
             'nif',
             'description',
-            'country_supplier'
+            'country_supplier',
+            'iva'
         )
         widgets = {
             'name': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'name', 'id':'name', 'required':True}),
@@ -53,4 +55,14 @@ class SpensesForm(forms.ModelForm):
         widgets = {
             'amount': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'amount', 'id':'amount', 'required':True}),
             'file': forms.FileInput(attrs={'class':'custom-file-input'}),
+        }
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        country = forms.ModelChoiceField(queryset=Country.objects.all(), required='true')
+        company = forms.ModelChoiceField(queryset=Company.objects.all(), required='true')
+        fields = ('username', 'first_name', 'last_name', 'picture', 'country', 'email', 'company', 'telephone', 'movil')
+        widgets = {
+            'picture': forms.FileInput(attrs={'class':'custom-file-input','onchange':'readURL(this);'})
         }

@@ -3,21 +3,21 @@
       "model": "part.iva",
       "pk": 1,
       "fields": {
-        "iva": "Español"
+        "name": "Español"
       }
     },
     {
         "model": "part.iva",
         "pk": 2,
         "fields": {
-          "iva": "Intracomunitario"
+          "name": "Intracomunitario"
         }
       },
       {
         "model": "part.iva",
         "pk": 3,
         "fields": {
-          "iva": "Extracomunitario"
+          "name": "Extracomunitario"
         }
       }
 ]
