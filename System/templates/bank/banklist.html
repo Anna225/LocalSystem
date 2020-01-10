@@ -11,53 +11,50 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="header">
-                        <a class="btn btn-primary" href="{% url 'supplieradd' %}"><i class="fa fa-plus-circle"></i>&nbsp; AÑADIR SUPPLIER</a>
-                        <h2 style="padding-top:12px;">SUPPLIER</h2>
+                        <a class="btn btn-primary" href="{% url 'bankadd' %}"><i class="fa fa-plus-circle"></i>&nbsp; AÑADIR BANCO</a>
+                        <h2 style="padding-top:12px;">BANCO</h2>
                     </div>
                     <div class="card" style="padding: 10px;">
                         <div style="padding: 10px; width:20%;">
-                            <input id="search_supplier" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                            <input id="search_bank" type="search" class="form-control" placeholder="Buscar" id="buscar">
                         </div>
                         <table class="table color-table primary-table">
                             <thead>
                                 <tr>
-                                    <th scope="col">Supplier</th>
-                                    <th scope="col">Nombre de Empresa</th>
-                                    <th scope="col">Dirección</th>
-                                    <th scope="col">Teléfono</th>
-                                    <th scope="col">Sitio web</th>
-                                    <th scope="col">NIF</th>
-                                    <th scope="col">IVA</th>
-                                    <th scope="col">País</th>
-                                    <th scope="col">Note</th>
+                                    <th scope="col">FECHA</th>
+                                    <th scope="col">Factura bancaria</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
                                     <th scope="col" class="text-center">Modificar</th>
                                 </tr>
                             </thead>
                             <tbody>	
-                            {% if suppliers %}	
-                                {% for supplier in suppliers %}
+                            {% if banks %}	
+                                {% for bank in banks %}
                                 <tr class="text-left">
-                                    <td><img src="{{supplier.picture.url}}" width="auto" height="35" style="border-radius:50%"></td>
-                                    <td class="text-left">{{supplier.name}}</td>
-                                    <td class="text-left">{{supplier.address}}</td>
-                                    <td class="text-left">{{supplier.phone}}</td>
-                                    <td class="text-left">{{supplier.web}}</td>
-                                    <td class="text-left">{{supplier.nif}}</td>
-                                    <td class="text-left">{{supplier.iva.name}}</td>
-                                    <td class="text-left">{{supplier.country_supplier.name}}</td> 
-                                    <td class="text-left">{{supplier.description|truncatechars:10}}</td>                                   
+                                    <td class="text-left">{{bank.date|date:"Y-m-d"}}</td> 
+                                    <td class="text-left"><a href="{{bank.invoice_name.url}}"><i class="fa fa-download"></i>&nbsp;{{bank.invoice_name|truncatechars:30}}</a></td>
+                                    {% if bank.flag != True %}        
+                                        <td><button type="button" id="write{{bank.id}}" class="btn btn-danger">Escribir</a></td>
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %} 
+                                    {% if bank.flag == True %}
+                                        <td><a href="{% url 'bankdetail' bank.id %}" class="btn btn-primary">Ver</a></td> 
+                                    {% else %}     
+                                        <td></td>
+                                    {% endif %}                    
                                     <td class="text-center" style="vertical-align: middle">
-                                        <a href="{% url 'supplierupdate' supplier.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
-                                        <a href="#" data-toggle="modal" data-target="#delete-supplier{{supplier.id}}"><i class="fa fa-trash"></i></a>
+                                        <a href="#" data-toggle="modal" data-target="#delete-bank{{bank.id}}"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
-                                <!--Delete Supplier-->
-								<div class="modal fade" id="delete-supplier{{supplier.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                <!--Delete Bank-->
+								<div class="modal fade" id="delete-bank{{bank.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
 									<div class="modal-dialog modal-xs">
 										<div class="modal-content" style="border-radius: 15px;">
 											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
 												<div class="align-items-center">
-													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR SUPPLIER</p>
+													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR BANCO</p>
 												</div>
 												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 													<span aria-hidden="true" style="color: #fff;">&times;</span>
@@ -70,7 +67,7 @@
 											</div>
 											<div class="modal-footer">
                                                 <center>
-                                                    <button id="delete-button{{supplier.id}}" class="btn btn-primary">SI</button>
+                                                    <button id="delete-button{{bank.id}}" class="btn btn-primary">SI</button>
                                                     <button data-dismiss="modal" class="btn btn-danger">NO</button>
                                                 </center>
 											</div>
@@ -78,9 +75,28 @@
 									</div>
 								</div>
 								<script>
-									$('#delete-button{{supplier.id}}').click(function(e){
-										var value = '{{supplier.id}}';
-										var url = '{% url "delete_supplier" %}';
+									$('#delete-button{{bank.id}}').click(function(e){
+										var value = '{{bank.id}}';
+										var url = '{% url "delete_bank" %}';
+										var token = '{{csrf_token}}';
+										$.ajax({
+											headers: { "X-CSRFToken": token },
+											method: 'POST',
+											url: url,
+											data: {
+												'value': value
+											},
+											success: function(data) {
+												if(data == 'Ok') {
+													location.reload();
+												}
+											}
+										});
+									});
+
+                                    $('#write{{bank.id}}').click(function(e){
+										var value = '{{bank.id}}';
+										var url = '{% url "add_bank_flag" %}';
 										var token = '{{csrf_token}}';
 										$.ajax({
 											headers: { "X-CSRFToken": token },
@@ -99,12 +115,12 @@
 								</script>
                                 {% endfor %}
                             {% else %}
-                                <td style="padding-bottom:30px;">No existen Supplier</td>
+                                <td style="padding-bottom:30px;">No existen Banco</td>
 							{% endif %}
                             </tbody>
                         </table>
                         <script>
-                            $("#search_supplier").keyup(function(){
+                            $("#search_bank").keyup(function(){
                                 _this = this;
                                 // Show only matching TR, hide rest of them
                                 $.each($("table tbody tr"), function() {
@@ -118,23 +134,23 @@
                             });
 			            </script>
                     </div>
-                    {% if suppliers.has_other_pages %}
+                    {% if banks.has_other_pages %}
                         <center>
                             <ul class="pagination text-center">
-                                {% if suppliers.has_previous %}
-                                    <li><a href="?page={{ suppliers.previous_page_number }}">&laquo;</a></li>
+                                {% if banks.has_previous %}
+                                    <li><a href="?page={{ banks.previous_page_number }}">&laquo;</a></li>
                                 {% else %}
                                     <li class="disabled"><span>&laquo;</span></li>
                                 {% endif %}
-                                {% for i in suppliers.paginator.page_range %}
-                                    {% if suppliers.number == i %}
+                                {% for i in banks.paginator.page_range %}
+                                    {% if banks.number == i %}
                                         <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
                                     {% else %}
                                         <li><a href="?page={{ i }}">{{ i }}</a></li>
                                     {% endif %}
                                 {% endfor %}
-                                {% if suppliers.has_next %}
-                                    <li><a href="?page={{ suppliers.next_page_number }}">&raquo;</a></li>
+                                {% if banks.has_next %}
+                                    <li><a href="?page={{ banks.next_page_number }}">&raquo;</a></li>
                                 {% else %}
                                     <li class="disabled"><span>&raquo;</span></li>
                                 {% endif %}

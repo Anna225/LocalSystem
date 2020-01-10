@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from System.part.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from System.part.models import Company, Supplier, Spenses, IVA
+from System.part.models import Company, Supplier, Spenses, IVA, Bank, BankData
 from cities_light.models import Country
 import os
 
@@ -20,6 +20,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import FormView, RedirectView
+
+import pandas as pd
 
 # Create your views here.
 
@@ -200,11 +202,19 @@ def delete_user(request):
     user.delete()
     return HttpResponse('Ok')
 
+def detect_new_user(request):
+    my_id = request.POST.get('value')
+    user = User.objects.get(id=my_id)
+    user.flag = True
+    user.save()
+    return HttpResponse('Ok')
+
 @method_decorator(login_required, name='dispatch')
 class supplieradd(CreateView):
     model = Supplier
     fields = "__all__"
     template_name = "supplier/supplieradd.html"
+    success_url = reverse_lazy('supplier')
 
     def get_context_data(self, **kwargs):
         context = super(supplieradd, self).get_context_data(**kwargs)
@@ -213,7 +223,7 @@ class supplieradd(CreateView):
         context["countrys"] = country
         context["ivas"] = iva
         return context
-
+    '''
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
             name = request.POST.get('name')
@@ -237,13 +247,18 @@ class supplieradd(CreateView):
             supplier.save()
         
         return redirect('supplier')
-
+    '''
 @method_decorator(login_required, name='dispatch')
 class supplierupdate(UpdateView):
     model = Supplier
     form_class = SupplierForm
     template_name = "supplier/update_supplier.html"
     success_url = reverse_lazy('supplier')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['supplier'] = Supplier.objects.get(pk=self.kwargs.get('pk'))
+        return context
 
 @login_required
 def spenses(request):
@@ -326,3 +341,79 @@ class userinformation_update(UpdateView):
     def get_success_url(self):
         return reverse('userinformation', kwargs={'pk': self.object.pk})
 
+
+@method_decorator(login_required, name='dispatch')
+class banklist(ListView):
+    
+    model = Bank
+    fields = "__all__"
+    template_name = "bank/banklist.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(banklist, self).get_context_data(**kwargs)
+        bank = Bank.objects.all().order_by('date')
+        paginator = Paginator(bank, 10)
+        page = self.request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        context["banks"] = page_obj
+
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class bankadd(CreateView):
+    
+    model = Bank
+    fields = "__all__"
+    template_name = "bank/bankadd.html"
+    success_url = reverse_lazy('banklist')
+
+
+def add_bank_flag(request):
+    my_id = request.POST.get('value')
+    bank = Bank.objects.get(id=my_id)
+    bank.flag = True
+    bank.save()
+    invoice_data = pd.read_excel(bank.invoice_name)
+
+    temp = [[]]
+    temp.clear()
+    for i in range(len(invoice_data)):
+        array = []
+        for j in range(len(invoice_data.loc[i])):
+            array.append((invoice_data.loc[i])[j])
+        temp.append(array)
+    if len(temp) > 0:
+        for i in range(len(temp)):
+            bankdata = BankData(
+                date_first = temp[i][0],
+                paid_name = temp[i][1],
+                bank_num_id = my_id,
+                date_second=temp[i][2],
+                amount=temp[i][3],
+            )
+            bankdata.save()
+
+    return HttpResponse('Ok')
+
+@method_decorator(login_required, name='dispatch')
+class bankdetail(ListView):
+    
+    model = BankData
+    fields = "__all__"
+    template_name = "bank/bankdetail.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bankdatas'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first')
+        context['spenses'] = Spenses.objects.all().order_by('date')
+        return context
+    
+
+def delete_bank(request):
+    my_id = request.POST.get('value')
+    bankdata = BankData.objects.filter(bank_num_id=my_id)
+    for data in bankdata:
+        data.delete()
+    bank = Bank.objects.get(id=my_id)
+    bank.delete()
+    return HttpResponse('Ok')

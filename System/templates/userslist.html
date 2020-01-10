@@ -26,85 +26,111 @@
                                     <th scope="col">Apellido</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Papel</th>
+                                    <th scope="col"></th>
                                     <th scope="col" class="text-center">Modificar</th>
                                 </tr>
                             </thead>
                             <tbody>	
                             {% if users %}	
                                 {% for user in users %}
-                                <tr class="text-left">
-                                    {% if user.picture %}
-                                        <td><img src="{{user.picture.url}}" style="width: 30px; display: inline-block; border-radius: 50%;"></td>
-                                    {% else %}
-                                        <td><img style="width: 30px; display: inline-block; border-radius: 50%;" src="{% static 'images/avatar-default.jpg'%}"></td>
-                                    {% endif %}
-                                    <td class="text-left">{{user.username}}</td>
-                                    <td class="text-left">{{user.first_name}}</td>
-                                    <td class="text-left">{{user.last_name}}</td>
-                                    <td class="text-left"><i class="fa fa-envelope-o"></i>&nbsp;{{user.email}}</td>
-                                    
-                                    {% if user.is_staff == True %}
-                                        <td class="bg-gray badge">Administración</td>
-                                    {% else %}
-                                        <td class="text-left">Usuario</td>
-                                    {% endif %}
-                                    {% if user.is_staff == True %}   
-                                        <td class="text-center" style="vertical-align: middle">
-                                            <!--a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a-->
-                                        </td>
-                                    {% else %}
-                                        <td class="text-center" style="vertical-align: middle">
-                                            <!--a href="{% url 'change_password' user.id %}"><i class="fa fa-pencil"></i></a-->&nbsp;
-                                            <a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a>
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                                <!--Delete Users-->
-								<div class="modal fade" id="delete-user{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-									<div class="modal-dialog modal-xs">
-										<div class="modal-content" style="border-radius: 15px;">
-											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
-												<div class="align-items-center">
-													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR USUARIO</p>
-												</div>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true" style="color: #fff;">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<div class="col-12">
-													<h5>¿Está seguro que quiere eliminar este registro?</h5>
-												</div>
-											</div>
-											<div class="modal-footer">
-                                                <center>
-                                                    <button id="delete-button{{user.id}}" class="btn btn-primary">SI</button>
-                                                    <button data-dismiss="modal" class="btn btn-danger">NO</button>
-                                                </center>
-											</div>
-										</div>
-									</div>
-								</div>
-								<script>
-									$('#delete-button{{user.id}}').click(function(e){
-										var value = '{{user.id}}';
-										var url = '{% url "delete_user" %}'; 
-										var token = '{{csrf_token}}';
-										$.ajax({
-											headers: { "X-CSRFToken": token },
-											method: 'POST',
-											url: url,
-											data: {
-												'value': value
-											},
-											success: function(data) {
-												if(data == 'Ok') {
-													location.reload();
-												}
-											}
-										});
-									});
-								</script>
+                                    <tr class="text-left">
+                                        {% if user.picture %}
+                                            <td><img src="{{user.picture.url}}" style="width: 30px; display: inline-block; border-radius: 50%;"></td>
+                                        {% else %}
+                                            <td><img style="width: 30px; display: inline-block; border-radius: 50%;" src="{% static 'images/avatar-default.jpg'%}"></td>
+                                        {% endif %}
+                                        <td class="text-left">{{user.username}}</td>
+                                        <td class="text-left">{{user.first_name}}</td>
+                                        <td class="text-left">{{user.last_name}}</td>
+                                        <td class="text-left"><i class="fa fa-envelope-o"></i>&nbsp;{{user.email}}</td>
+                                        
+                                        {% if user.is_staff == True %}
+                                            <td class="bg-gray badge">Administración</td>
+                                        {% else %}
+                                            <td class="text-left">Usuario</td>
+                                        {% endif %}
+                                        {% if user.flag != True %}
+                                            <td><button id="new{{user.id}}" class="btn btn-primary">New</button></td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+                                        {% if user.is_staff == True %}   
+                                            <td class="text-center" style="vertical-align: middle">
+                                                <!--a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a-->
+                                            </td>
+                                        {% else %}
+                                            <td class="text-center" style="vertical-align: middle">
+                                                <!--a href="{% url 'change_password' user.id %}"><i class="fa fa-pencil"></i></a-->&nbsp;
+                                                <a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                    <!--Delete Users-->
+                                    <div class="modal fade" id="delete-user{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-xs">
+                                            <div class="modal-content" style="border-radius: 15px;">
+                                                <div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+                                                    <div class="align-items-center">
+                                                        <p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR USUARIO</p>
+                                                    </div>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true" style="color: #fff;">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="col-12">
+                                                        <h5>¿Está seguro que quiere eliminar este registro?</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <center>
+                                                        <button id="delete-button{{user.id}}" class="btn btn-primary">SI</button>
+                                                        <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                    </center>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script>
+                                        $('#delete-button{{user.id}}').click(function(e){
+                                            var value = '{{user.id}}';
+                                            var url = '{% url "delete_user" %}'; 
+                                            var token = '{{csrf_token}}';
+                                            $.ajax({
+                                                headers: { "X-CSRFToken": token },
+                                                method: 'POST',
+                                                url: url,
+                                                data: {
+                                                    'value': value
+                                                },
+                                                success: function(data) {
+                                                    if(data == 'Ok') {
+                                                        location.reload();
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    </script>
+                                    <script>
+                                        $("#new{{user.id}}").click(function(e){
+                                            var value = '{{user.id}}';
+                                            var url = '{% url "detect_new_user" %}'; 
+                                            var token = '{{csrf_token}}';
+                                            $.ajax({
+                                                headers: { "X-CSRFToken": token },
+                                                method: 'POST',
+                                                url: url,
+                                                data: {
+                                                    'value': value
+                                                },
+                                                success: function(data) {
+                                                    if(data == 'Ok') {
+                                                        location.reload();
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    </script>
                                 {% endfor %}
                             {% else %}
                                 <td style="padding-bottom:30px;">No existen Usuario</td>

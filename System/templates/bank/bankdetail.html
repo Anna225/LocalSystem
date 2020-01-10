@@ -1,0 +1,148 @@
+{% extends 'basic.html' %}
+{% block style %}
+    {% load static %}
+    <!-- Sweetalert Css -->
+    <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Basic Examples -->
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="header">
+                        <h2 style="padding-top:12px;">DETALLE BANCARIO</h2>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4>DATOS BANCARIOS</h4>
+                        <div class="card" style="padding: 10px;">
+                            <div style="padding: 10px; width:40%;">
+                                <input id="search_bankdetail" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                            </div>
+                            <table class="table color-table primary-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">FECHA1</th>
+                                        <th scope="col">Factura bancaria</th>
+                                        <th scope="col">FECHA2</th>
+                                        <th scope="col">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>	
+                                {% if bankdatas %}	
+                                    {% for bankdata in bankdatas %}
+                                    <tr class="text-left">
+                                        <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
+                                        <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
+                                        <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
+                                        <td class="text-left">{{bankdata.amount}}</td>                   
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <td style="padding-bottom:30px;">No existen Banco Datos</td>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                            <script>
+                                $("#search_bankdetail").keyup(function(){
+                                    _this = this;
+                                    // Show only matching TR, hide rest of them
+                                    $.each($("table tbody tr"), function() {
+                                        if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1){
+                                            $(this).hide();
+                                        }
+                                        else {
+                                            $(this).show();
+                                        }
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <h4>DATOS SPENSES</h4>
+                        <div class="card" style="padding: 10px;">
+                            <div style="padding: 10px; width:40%;">
+                                <input id="search_spense" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                            </div>
+                            <!--form action="." id="search" method="POST" target="_parent" enctype='multipart/form-data'>
+                                <div style="padding: 15px; width:100%;">
+                                    <div class="col-lg-1">
+                                        <label>INICIO: </label>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                        <input id="start_date" name="start_date" required/>	
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <label>FIN: </label>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                        <input id="end_date" name="end_date" required/>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                        <button type="submit" class="btn btn-primary">Buscar</button>
+                                    </div> 
+                                </div>
+                            </form-->
+                            <table class="table color-table primary-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">FECHA</th>
+                                        <th scope="col">Supplier</th>
+                                        <th scope="col">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>	
+                                {% if spenses %}	
+                                    {% for spense in spenses %}
+                                    <tr class="text-left">
+                                        <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
+                                        <td class="text-left">{{spense.supplier.name}}</td>   
+                                        <td class="text-left">{{spense.amount}}</td>                   
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <td style="padding-bottom:30px;">No existen Spenses</td>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                            <script>
+                                $("#search_spense").keyup(function(){
+                                    _this = this;
+                                    // Show only matching TR, hide rest of them
+                                    $.each($("table tbody tr"), function() {
+                                        if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1){
+                                            $(this).hide();
+                                        }
+                                        else {
+                                            $(this).show();
+                                        }
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <!--script>
+	$('#start_date').datepicker({
+    format: 'yyyy-mm-dd',
+    maxDate: function () {
+      return $('#end_date').val();
+		}
+    });
+	$('#end_date').datepicker({
+    format: 'yyyy-mm-dd',
+    minDate: function () {
+      return $('#start_date').val();
+    }
+	});
+    </script-->
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+{% endblock %}

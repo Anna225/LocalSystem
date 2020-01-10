@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from System.part import views as part_view
-from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist
+from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist, banklist, bankadd, bankdetail
 from .views import companyupdate, supplierupdate, spensesupdate
 
 from django.contrib.auth.views import PasswordResetView 
@@ -39,6 +39,7 @@ urlpatterns = [
     path('Categorie/', part_view.Categorie, name='Categorie'),
     url(r'^userlist/$', userlist.as_view(), name='userlist'),
     url(r'^delete_user/$', part_view.delete_user, name='delete_user'),
+    url(r'^detect_new_user/$', part_view.detect_new_user, name='detect_new_user'),
     url(r'^reset/password/$', PasswordResetView.as_view(template_name='password_reset_form.html', email_template_name='password_reset_email.html'), name='password_reset'),
     url(r'^reset/password/reset/done/$', PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
@@ -46,5 +47,10 @@ urlpatterns = [
     url(r'^change/password/(?P<pk>[0-9]+)/$', PasswordChangeView.as_view(template_name='password_change.html', success_url='/'), name='change_password'),
     url(r'^personallist/(?P<pk>\d+)/$', userinformation.as_view(), name='userinformation'),
     url(r'^personallist_update/(?P<pk>\d+)/$', userinformation_update.as_view(), name='userinformation_update'),
+    url(r'^banklist/$', banklist.as_view(), name='banklist'),
+    url(r'^bankadd/$', bankadd.as_view(), name='bankadd'),
+    url(r'^bankdetail/(?P<pk>\d+)$', bankdetail.as_view(), name='bankdetail'),
+    url(r'^add_bank_flag/$', part_view.add_bank_flag, name='add_bank_flag'),
+    url(r'^delete_bank/$', part_view.delete_bank, name='delete_bank'),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

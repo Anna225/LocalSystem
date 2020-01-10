@@ -12,6 +12,7 @@
       "email": "admin@admin.com",
       "is_staff": true,
       "is_active": true,
+      "flag": true,
       "date_joined": "2020-01-04T18:27:51Z"
     }
   }

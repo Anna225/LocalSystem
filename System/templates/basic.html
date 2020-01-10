@@ -92,7 +92,7 @@
                     active
                 {% endif %}">
                     <a href="{% url 'index' %}">
-                        <i class="material-icons">desktop_mac</i>
+                        <i class="material-icons">home</i>
                         <span>Home</span>
                     </a>
                 </li>
@@ -123,6 +123,11 @@
                 <li class="{% if 'spenses' in request.path %}active{% endif %}">
                     <a href="{% url 'spenses' %}"><i class="material-icons">shopping_cart</i>
                         <span>Spenses</span>
+                    </a>
+                </li> 
+                <li class="{% if 'bank' in request.path %}active{% endif %}">
+                    <a href="{% url 'banklist' %}"><i class="material-icons">report</i>
+                        <span>Factura bancaria</span>
                     </a>
                 </li> 
                 <li class="{% if 'personallist' in request.path %}

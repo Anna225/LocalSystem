@@ -37,7 +37,8 @@ class SupplierForm(forms.ModelForm):
             'nif',
             'description',
             'country_supplier',
-            'iva'
+            'iva',
+            'picture'
         )
         widgets = {
             'name': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'name', 'id':'name', 'required':True}),
@@ -45,6 +46,7 @@ class SupplierForm(forms.ModelForm):
             'address': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'address', 'id':'address', 'required':True}),
             'web': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'web', 'id':'web', 'required':True}),
             'nif': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'nif', 'id':'nif', 'required':True}),
+            'picture': forms.FileInput(attrs={'class':'custom-file-input','onchange':'readURL(this);'}),
             
         }
 

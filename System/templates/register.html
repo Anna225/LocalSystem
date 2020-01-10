@@ -27,7 +27,7 @@
         </div>
         <div class="card">
             <div class="body">
-                <form id="sign_up" action='{% url 'signup' %}' method="POST">
+                <form id="sign_up" action='{% url 'signup' %}' method="POST" enctype='multipart/form-data'>
                     {% csrf_token %}
                     <div class="input-group">
                         <span class="input-group-addon">
