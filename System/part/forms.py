@@ -1,5 +1,5 @@
 from django import forms
-from System.part.models import Company, Supplier, Spenses
+from System.part.models import Company, Supplier, Spenses, Bank
 from cities_light.models import Country
 from System.part.models import User
 
@@ -67,4 +67,13 @@ class UserForm(forms.ModelForm):
         fields = ('username', 'first_name', 'last_name', 'picture', 'country', 'email', 'company', 'telephone', 'movil')
         widgets = {
             'picture': forms.FileInput(attrs={'class':'custom-file-input','onchange':'readURL(this);'})
+        }
+
+
+class BankForm(forms.ModelForm):
+    class Meta:
+        model = Bank
+        fields = ('date', 'bank_search_start', 'supplier_name', 'invoice_name', 'bank_search_end')
+        widgets = {
+            'invoice_name': forms.FileInput(attrs={'class':'custom-file-input'}),
         }

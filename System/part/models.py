@@ -42,7 +42,7 @@ class Supplier(models.Model):
     country_supplier = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True)
     iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
-    picture = models.ImageField(upload_to=content_file_supplier, blank=True)
+    picture = models.ImageField(upload_to=content_file_supplier, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -77,12 +77,15 @@ class User(AbstractUser):
         permissions = (("admin_user","Can use modules admin"),("guest_user","Can use modules guest"))
 
 class Bank(models.Model):
+    supplier_name = models.CharField(max_length=100, blank=True, null=True)
     date = models.DateField(null=True, blank=True)
     invoice_name = models.FileField(upload_to=bank_file, blank=True, null=True)
     flag = models.IntegerField(blank=True, null=True)
+    bank_search_start = models.DateField(null=True, blank=True)
+    bank_search_end = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return self.date
+        return self.supplier_name
 
 class BankData(models.Model):
     date_first = models.DateField(null=True, blank=True)
@@ -90,6 +93,7 @@ class BankData(models.Model):
     bank_num = models.ForeignKey(Bank, on_delete=models.SET_NULL, blank=True, null=True)
     date_second = models.DateField(null=True, blank=True)
     amount = models.CharField(max_length=30, blank=True, null=True)
+    balance = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
         return self.paid_name

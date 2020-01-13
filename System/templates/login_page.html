@@ -37,6 +37,9 @@
             <div class="body">
                 <form id="sign_in" method="POST">
                       {% csrf_token %}
+                    <div class="input-group" style="text-align: center;">
+                        <img src="{% static 'images/invoice_logo.png' %}" width="100" height="auto">
+                    </div>
                     <div class="input-group">
                         <span class="input-group-addon">
                             <i class="material-icons">person</i>

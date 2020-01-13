@@ -16,7 +16,7 @@
                     </div>
                     <div class="card" style="padding: 10px;">
                         <div style="padding: 10px; width:20%;">
-                            <input id="search_spenses" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                            <input id="search_spenses" type="search" class="form-control" placeholder="Buscar">
                         </div>
                         <table class="table color-table primary-table">
                             <thead>
@@ -38,7 +38,7 @@
                                     <td>{{spense.company.name}}</td>
                                     <td>{{spense.company.name}}</td>
                                     <td>{{spense.supplier.name}}</td>
-                                    <td>{{spense.amount}} (€)</td>
+                                    <td>{{spense.amount}}</td>
                                     <td><i class="fa fa-calendar"></i>&nbsp;{{spense.date|date:"Y-m-d"}}</td>
                                     <td>{{spense.iva.name}}</td>
                                     {% if spense.file %}

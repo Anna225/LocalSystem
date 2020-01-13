@@ -13,7 +13,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from django.urls import reverse, reverse_lazy
-from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm
+from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm, BankForm
 
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -95,9 +95,11 @@ class index(ListView):
         context = super(index, self).get_context_data(**kwargs)
         company = Company.objects.all().count()
         supplier = Supplier.objects.all().count()
+        spenses = Spenses.objects.all().count()
         
         context["company_num"] = company
         context["supplier_num"] = supplier
+        context["spense_num"] = spenses
         
         return context
 
@@ -360,6 +362,19 @@ class banklist(ListView):
         return context
 
 @method_decorator(login_required, name='dispatch')
+class bankupdate(UpdateView):
+    
+    model = Bank
+    form_class = BankForm
+    template_name = "bank/bank_update.html"
+    success_url = reverse_lazy('banklist')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['file'] = Bank.objects.get(pk=self.kwargs.get('pk'))
+        return context
+
+@method_decorator(login_required, name='dispatch')
 class bankadd(CreateView):
     
     model = Bank
@@ -373,8 +388,8 @@ def add_bank_flag(request):
     bank = Bank.objects.get(id=my_id)
     bank.flag = True
     bank.save()
-    invoice_data = pd.read_excel(bank.invoice_name)
-
+    invoice_data = pd.read_csv(bank.invoice_name)
+    
     temp = [[]]
     temp.clear()
     for i in range(len(invoice_data)):
@@ -382,17 +397,23 @@ def add_bank_flag(request):
         for j in range(len(invoice_data.loc[i])):
             array.append((invoice_data.loc[i])[j])
         temp.append(array)
+    
     if len(temp) > 0:
-        for i in range(len(temp)):
+        for i in range(2, len(temp)):
+            
+            temp_fecha = temp[i][0].split('/')[2] + "-" + temp[i][0].split('/')[1] + "-" + temp[i][0].split('/')[0]
+            temp_fecha_vlaor = temp[i][2].split('/')[2] + "-" + temp[i][2].split('/')[1] + "-" + temp[i][2].split('/')[0]
+
             bankdata = BankData(
-                date_first = temp[i][0],
+                date_first = temp_fecha,
                 paid_name = temp[i][1],
                 bank_num_id = my_id,
-                date_second=temp[i][2],
+                date_second=temp_fecha_vlaor,
                 amount=temp[i][3],
+                balance=temp[i][4],
             )
             bankdata.save()
-
+            
     return HttpResponse('Ok')
 
 @method_decorator(login_required, name='dispatch')
@@ -405,9 +426,24 @@ class bankdetail(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['bankdatas'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first')
-        context['spenses'] = Spenses.objects.all().order_by('date')
+        bank_date = Bank.objects.get(pk=self.kwargs.get('pk'))
+        #context['spenses'] = Spenses.objects.all()
+        context['spenses'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date')
+        #context['spenses_all'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date').count()
+        #context['bankdatas_all'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first').count()
+        context['value'] = self.kwargs.get('pk')
         return context
-    
+
+    def post(self, request, *args, **kwargs):
+     
+        if request.method == 'POST':
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+            value = request.POST.get('value')
+            spenses = Spenses.objects.filter(date__gte=start_date, date__lte=end_date).order_by('date')
+
+            return render(request, 'bank/banksearch.html', {'spenses': spenses, 'start_date': start_date, 'end_date': end_date, 'value':value}) 
+ 
 
 def delete_bank(request):
     my_id = request.POST.get('value')

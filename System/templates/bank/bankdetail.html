@@ -17,15 +17,16 @@
                         <h4>DATOS BANCARIOS</h4>
                         <div class="card" style="padding: 10px;">
                             <div style="padding: 10px; width:40%;">
-                                <input id="search_bankdetail" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                                <input id="search_bankdetail" type="search" class="form-control" placeholder="Buscar">
                             </div>
                             <table class="table color-table primary-table">
                                 <thead>
                                     <tr>
-                                        <th scope="col">FECHA1</th>
-                                        <th scope="col">Factura bancaria</th>
-                                        <th scope="col">FECHA2</th>
-                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">FECHA</th>
+                                        <th scope="col">CONCEPTO</th>
+                                        <th scope="col">FECHA VALOR</th>
+                                        <th scope="col">IMPORTE</th>
+                                        <th scope="col">SALDO</th>
                                     </tr>
                                 </thead>
                                 <tbody>	
@@ -35,7 +36,8 @@
                                         <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
                                         <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
                                         <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
-                                        <td class="text-left">{{bankdata.amount}}</td>                   
+                                        <td class="text-left">{{bankdata.amount}}</td> 
+                                        <td class="text-left">{{bankdata.balance}}</td>                   
                                     </tr>
                                     {% endfor %}
                                 {% else %}
@@ -62,11 +64,9 @@
 
                     <div class="col-lg-6">
                         <h4>DATOS SPENSES</h4>
-                        <div class="card" style="padding: 10px;">
-                            <div style="padding: 10px; width:40%;">
-                                <input id="search_spense" type="search" class="form-control" placeholder="Buscar" id="buscar">
-                            </div>
-                            <!--form action="." id="search" method="POST" target="_parent" enctype='multipart/form-data'>
+                        <div id="search_hidden"></div>
+                        <div class="card" style="padding: 10px;" id="search_spense">
+                                
                                 <div style="padding: 15px; width:100%;">
                                     <div class="col-lg-1">
                                         <label>INICIO: </label>
@@ -81,10 +81,10 @@
                                         <input id="end_date" name="end_date" required/>
                                     </div>
                                     <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
-                                        <button type="submit" class="btn btn-primary">Buscar</button>
+                                        <button id="search_button" class="btn btn-primary">Buscar</button>
                                     </div> 
                                 </div>
-                            </form-->
+
                             <table class="table color-table primary-table">
                                 <thead>
                                     <tr>
@@ -107,20 +107,6 @@
                                 {% endif %}
                                 </tbody>
                             </table>
-                            <script>
-                                $("#search_spense").keyup(function(){
-                                    _this = this;
-                                    // Show only matching TR, hide rest of them
-                                    $.each($("table tbody tr"), function() {
-                                        if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1){
-                                            $(this).hide();
-                                        }
-                                        else {
-                                            $(this).show();
-                                        }
-                                    });
-                                });
-                            </script>
                         </div>
                     </div>
                 </div>
@@ -129,20 +115,53 @@
     </section>
 {% endblock %}
 {% block script %}
-    <!--script>
-	$('#start_date').datepicker({
-    format: 'yyyy-mm-dd',
-    maxDate: function () {
-      return $('#end_date').val();
-		}
-    });
-	$('#end_date').datepicker({
-    format: 'yyyy-mm-dd',
-    minDate: function () {
-      return $('#start_date').val();
-    }
-	});
-    </script-->
+    <script>
+        $('#start_date').datepicker({
+            format: 'yyyy-mm-dd',
+            maxDate: function () {
+            return $('#end_date').val();
+            }
+        });
+        $('#end_date').datepicker({
+            format: 'yyyy-mm-dd',
+            minDate: function () {
+            return $('#start_date').val();
+        }
+        });
+        $("#search_button").on('click', function(){
+            var token = '{{csrf_token}}';
+            var value = {{value}};
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            var my_url = '{% url "bankdetail" value %}';
+            if(start_date !== "" && end_date !== ""){
+                $("#search_spense").hide();
+                
+                $.ajax({
+                    headers: { "X-CSRFToken": token },
+                    method: 'POST',
+                    url: my_url,
+                    data: {
+                        'start_date': start_date,
+                        'end_date': end_date,
+                        'value': value
+                    },
+                    success: function(data) {
+                        $('#search_hidden').html(data);
+                    }
+                });
+            }
+            else if(start_date === "" && end_date === ""){
+                $("#start_date").focus();
+            }
+            else if(start_date !== "" && end_date === ""){
+                $("#end_date").focus();
+            }
+            else if(start_date === "" && end_date !== ""){
+                $("#start_date").focus();
+            }
+        })
+    </script>
     <!-- SweetAlert Plugin Js -->
     <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
 {% endblock %}

@@ -16,13 +16,16 @@
                     </div>
                     <div class="card" style="padding: 10px;">
                         <div style="padding: 10px; width:20%;">
-                            <input id="search_bank" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                            <input id="search_bank" type="search" class="form-control" placeholder="Buscar">
                         </div>
                         <table class="table color-table primary-table">
                             <thead>
                                 <tr>
                                     <th scope="col">FECHA</th>
                                     <th scope="col">Factura bancaria</th>
+                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Comienzo</th>
+                                    <th scope="col">Final</th>
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col" class="text-center">Modificar</th>
@@ -32,8 +35,15 @@
                             {% if banks %}	
                                 {% for bank in banks %}
                                 <tr class="text-left">
-                                    <td class="text-left">{{bank.date|date:"Y-m-d"}}</td> 
-                                    <td class="text-left"><a href="{{bank.invoice_name.url}}"><i class="fa fa-download"></i>&nbsp;{{bank.invoice_name|truncatechars:30}}</a></td>
+                                    <td class="text-left"><i class="fa fa-calendar"></i>&nbsp;{{bank.date|date:"Y-m-d"}}</td> 
+                                    {% if bank.invoice_name %}
+                                        <td class="text-left"><a href="{{bank.invoice_name.url}}"><i class="fa fa-download"></i>&nbsp;{{bank.invoice_name|truncatechars:30}}</a></td>
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %}
+                                    <td class="text-left">{{bank.supplier_name}}</td>
+                                    <td class="text-left"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_start|date:"Y-m-d"}}</td> 
+                                    <td class="text-left"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_end|date:"Y-m-d"}}</td> 
                                     {% if bank.flag != True %}        
                                         <td><button type="button" id="write{{bank.id}}" class="btn btn-danger">Escribir</a></td>
                                     {% else %}
@@ -45,6 +55,7 @@
                                         <td></td>
                                     {% endif %}                    
                                     <td class="text-center" style="vertical-align: middle">
+                                        <a href="{% url 'bankupdate' bank.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
                                         <a href="#" data-toggle="modal" data-target="#delete-bank{{bank.id}}"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>

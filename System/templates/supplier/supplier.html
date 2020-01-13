@@ -16,7 +16,7 @@
                     </div>
                     <div class="card" style="padding: 10px;">
                         <div style="padding: 10px; width:20%;">
-                            <input id="search_supplier" type="search" class="form-control" placeholder="Buscar" id="buscar">
+                            <input id="search_supplier" type="search" class="form-control" placeholder="Buscar">
                         </div>
                         <table class="table color-table primary-table">
                             <thead>
@@ -37,7 +37,11 @@
                             {% if suppliers %}	
                                 {% for supplier in suppliers %}
                                 <tr class="text-left">
-                                    <td><img src="{{supplier.picture.url}}" width="auto" height="35" style="border-radius:50%"></td>
+                                    {% if supplier.picture %}
+                                        <td><img src="{{supplier.picture.url}}" width="auto" height="35" style="border-radius:50%"></td>
+                                    {% else %}
+                                        <td><img id="supplier-img-reload" src="{% static 'images/default.png' %}" width="auto" height="35" style="border-radius:50%" alt="" /></td>
+                                    {% endif %}
                                     <td class="text-left">{{supplier.name}}</td>
                                     <td class="text-left">{{supplier.address}}</td>
                                     <td class="text-left">{{supplier.phone}}</td>

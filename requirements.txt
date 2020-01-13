@@ -1,2 +1,6 @@
 django==2.2.6
+django-autocomplete-light
 django-cities-light
+django-import-export
+pandas
+Pillow

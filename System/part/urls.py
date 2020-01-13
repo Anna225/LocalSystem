@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from System.part import views as part_view
-from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist, banklist, bankadd, bankdetail
+from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist, banklist, bankadd, bankdetail, bankupdate
 from .views import companyupdate, supplierupdate, spensesupdate
 
 from django.contrib.auth.views import PasswordResetView 
@@ -52,5 +52,6 @@ urlpatterns = [
     url(r'^bankdetail/(?P<pk>\d+)$', bankdetail.as_view(), name='bankdetail'),
     url(r'^add_bank_flag/$', part_view.add_bank_flag, name='add_bank_flag'),
     url(r'^delete_bank/$', part_view.delete_bank, name='delete_bank'),
+    url(r'^bank_update/(?P<pk>\d+)/$', bankupdate.as_view(), name='bankupdate'),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
