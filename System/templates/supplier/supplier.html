@@ -38,9 +38,9 @@
                                 {% for supplier in suppliers %}
                                 <tr class="text-left">
                                     {% if supplier.picture %}
-                                        <td><img src="{{supplier.picture.url}}" width="auto" height="35" style="border-radius:50%"></td>
+                                        <td><img src="{{supplier.picture.url}}" draggable="false" width="auto" height="35" style="border-radius:50%"></td>
                                     {% else %}
-                                        <td><img id="supplier-img-reload" src="{% static 'images/default.png' %}" width="auto" height="35" style="border-radius:50%" alt="" /></td>
+                                        <td><img id="supplier-img-reload" draggable="false" src="{% static 'images/default.png' %}" width="auto" height="35" style="border-radius:50%" alt="" /></td>
                                     {% endif %}
                                     <td class="text-left">{{supplier.name}}</td>
                                     <td class="text-left">{{supplier.address}}</td>

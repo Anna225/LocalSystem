@@ -112,9 +112,9 @@
                                                 <label for="photo">Fotografía</label>
                                                 <div class="foto-img">
                                                     {% if user.picture %}
-                                                        <img id="product-img-reload" src="{{ user.picture.url }}" alt="">
+                                                        <img id="product-img-reload" draggable="false" src="{{ user.picture.url }}" alt="">
                                                     {% else %}
-                                                        <img id="product-img-reload" src="{% static 'images/avatar-default.jpg' %}" alt="" />	
+                                                        <img id="product-img-reload" draggable="false" src="{% static 'images/avatar-default.jpg' %}" alt="" />	
                                                     {% endif %}
                                                 </div>
                                             </div>

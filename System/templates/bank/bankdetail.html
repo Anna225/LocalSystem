@@ -32,13 +32,23 @@
                                 <tbody>	
                                 {% if bankdatas %}	
                                     {% for bankdata in bankdatas %}
-                                    <tr class="text-left">
-                                        <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
-                                        <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
-                                        <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
-                                        <td class="text-left">{{bankdata.amount}}</td> 
-                                        <td class="text-left">{{bankdata.balance}}</td>                   
-                                    </tr>
+                                        {% if bankdata.flag != True %}
+                                            <tr class="text-left">
+                                                <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
+                                                <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
+                                                <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
+                                                <td class="text-left">{{bankdata.amount}}</td> 
+                                                <td class="text-left">{{bankdata.balance}}</td>                   
+                                            </tr>
+                                        {% else %}
+                                            <tr class="text-left" style="color:red!important;">
+                                                <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
+                                                <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
+                                                <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
+                                                <td class="text-left">{{bankdata.amount}}</td> 
+                                                <td class="text-left">{{bankdata.balance}}</td>                   
+                                            </tr>
+                                        {% endif %}
                                     {% endfor %}
                                 {% else %}
                                     <td style="padding-bottom:30px;">No existen Banco Datos</td>
@@ -67,23 +77,23 @@
                         <div id="search_hidden"></div>
                         <div class="card" style="padding: 10px;" id="search_spense">
                                 
-                                <div style="padding: 15px; width:100%;">
-                                    <div class="col-lg-1">
-                                        <label>INICIO: </label>
-                                    </div>
-                                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
-                                        <input id="start_date" name="start_date" required/>	
-                                    </div>
-                                    <div class="col-lg-1">
-                                        <label>FIN: </label>
-                                    </div>
-                                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
-                                        <input id="end_date" name="end_date" required/>
-                                    </div>
-                                    <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
-                                        <button id="search_button" class="btn btn-primary">Buscar</button>
-                                    </div> 
+                            <div style="padding: 15px; width:100%;">
+                                <div class="col-lg-1">
+                                    <label>INICIO: </label>
                                 </div>
+                                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                    <input id="start_date" name="start_date" required/>	
+                                </div>
+                                <div class="col-lg-1">
+                                    <label>FIN: </label>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                    <input id="end_date" name="end_date" required/>
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                    <button id="search_button" class="btn btn-primary">Buscar</button>
+                                </div> 
+                            </div>
 
                             <table class="table color-table primary-table">
                                 <thead>
@@ -91,16 +101,79 @@
                                         <th scope="col">FECHA</th>
                                         <th scope="col">Supplier</th>
                                         <th scope="col">Cantidad</th>
+                                        <th scope="col" class="text-center">Modificar</th>
                                     </tr>
                                 </thead>
                                 <tbody>	
                                 {% if spenses %}	
                                     {% for spense in spenses %}
-                                    <tr class="text-left">
-                                        <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
-                                        <td class="text-left">{{spense.supplier.name}}</td>   
-                                        <td class="text-left">{{spense.amount}}</td>                   
-                                    </tr>
+                                        {% if spense.flag != True %}
+                                            <tr class="text-left">
+                                                <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
+                                                <td class="text-left">{{spense.supplier.name}}</td>   
+                                                <td class="text-left">{{spense.amount}}</td> 
+                                                <td class="text-center" style="vertical-align: middle">
+                                                    <a href="{% url 'spensesupdate' spense.id %}" target="_blank"><i class="fa fa-pencil"></i></a>&nbsp;
+                                                    <a href="#" data-toggle="modal" data-target="#delete-spenses{{spense.id}}"><i class="fa fa-trash"></i></a>
+                                                </td>                  
+                                            </tr>
+                                        {% else %}
+                                            <tr class="text-left" style="color:blue!important;">
+                                                <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
+                                                <td class="text-left">{{spense.supplier.name}}</td>   
+                                                <td class="text-left">{{spense.amount}}</td>      
+                                                <td class="text-center" style="vertical-align: middle">
+                                                    <a href="{% url 'spensesupdate' spense.id %}" target="_blank"><i class="fa fa-pencil"></i></a>&nbsp;
+                                                    <a href="#" data-toggle="modal" data-target="#delete-spenses{{spense.id}}"><i class="fa fa-trash"></i></a>
+                                                </td>             
+                                            </tr>
+                                        {% endif %}
+                                        <!--Delete Spenses-->
+                                        <div class="modal fade" id="delete-spenses{{spense.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-xs">
+                                                <div class="modal-content" style="border-radius: 15px;">
+                                                    <div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+                                                        <div class="align-items-center">
+                                                            <p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR SPENSES</p>
+                                                        </div>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true" style="color: #fff;">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="col-12">
+                                                            <h5>¿Está seguro que quiere eliminar este registro?</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <center>
+                                                            <button id="delete-button{{spense.id}}" class="btn btn-primary">SI</button>
+                                                            <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                        </center>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $('#delete-button{{spense.id}}').click(function(e){
+                                                var value = '{{spense.id}}';
+                                                var url = '{% url "delete_spense" %}'; 
+                                                var token = '{{csrf_token}}';
+                                                $.ajax({
+                                                    headers: { "X-CSRFToken": token },
+                                                    method: 'POST',
+                                                    url: url,
+                                                    data: {
+                                                        'value': value
+                                                    },
+                                                    success: function(data) {
+                                                        if(data == 'Ok') {
+                                                            location.reload();
+                                                        }
+                                                    }
+                                                });
+                                            });
+                                        </script>
                                     {% endfor %}
                                 {% else %}
                                     <td style="padding-bottom:30px;">No existen Spenses</td>
@@ -112,6 +185,7 @@
                 </div>
             </div>
         </div>
+        
     </section>
 {% endblock %}
 {% block script %}

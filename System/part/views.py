@@ -427,11 +427,34 @@ class bankdetail(ListView):
         context = super().get_context_data(**kwargs)
         context['bankdatas'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first')
         bank_date = Bank.objects.get(pk=self.kwargs.get('pk'))
+        context['value'] = self.kwargs.get('pk')
         #context['spenses'] = Spenses.objects.all()
         context['spenses'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date')
+        #print("+++++++++++++++++", BankData.objects.filter(bank_num_id=self.kwargs.get('pk')))
         #context['spenses_all'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date').count()
         #context['bankdatas_all'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first').count()
-        context['value'] = self.kwargs.get('pk')
+        bank_except = BankData.objects.exclude(amount__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).values_list('amount', flat=True), date_first__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).values_list('date', flat=True)).all()
+        for bank_date_temp in BankData.objects.filter(bank_num_id=self.kwargs.get('pk')):
+            bank_date_temp.flag = False
+            bank_date_temp.save()
+
+        if bank_except.count() != 0:
+            for bank_except_detail in bank_except:
+                bank_except_detail.flag = True
+                bank_except_detail.save()
+                
+        spenses_except = Spenses.objects.exclude(amount__in=BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).values_list('amount', flat=True),date__in=BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).values_list('date_first', flat=True)).all()
+        
+        if spenses_except.count() != 0:
+            for spenses_except_detail in spenses_except:
+                spenses_except_detail.flag = True
+                spenses_except_detail.save()
+        else:
+            spenses_temp = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date')
+            for temp_spense in spenses_temp:
+                temp_spense.flag = False
+                temp_spense.save()
+
         return context
 
     def post(self, request, *args, **kwargs):

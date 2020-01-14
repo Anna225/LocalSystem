@@ -55,6 +55,7 @@ class Spenses(models.Model):
     date = models.DateField(null=True, blank=True)
     file = models.FileField(upload_to=invoice_file, blank=True, null=True)
     iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
+    flag = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.amount
@@ -94,6 +95,7 @@ class BankData(models.Model):
     date_second = models.DateField(null=True, blank=True)
     amount = models.CharField(max_length=30, blank=True, null=True)
     balance = models.CharField(max_length=30, blank=True, null=True)
+    flag = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.paid_name
