@@ -110,7 +110,7 @@
                                         {% if spense.flag != True %}
                                             <tr class="text-left">
                                                 <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
-                                                <td class="text-left">{{spense.supplier.name}}</td>   
+                                                <td class="text-left">{{spense.supplier.name|truncatechars:30}}</td>   
                                                 <td class="text-left">{{spense.amount}}</td> 
                                                 <td class="text-center" style="vertical-align: middle">
                                                     <a href="{% url 'spensesupdate' spense.id %}" target="_blank"><i class="fa fa-pencil"></i></a>&nbsp;
@@ -120,7 +120,7 @@
                                         {% else %}
                                             <tr class="text-left" style="color:blue!important;">
                                                 <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
-                                                <td class="text-left">{{spense.supplier.name}}</td>   
+                                                <td class="text-left">{{spense.supplier.name|truncatechars:30}}</td>   
                                                 <td class="text-left">{{spense.amount}}</td>      
                                                 <td class="text-center" style="vertical-align: middle">
                                                     <a href="{% url 'spensesupdate' spense.id %}" target="_blank"><i class="fa fa-pencil"></i></a>&nbsp;
