@@ -84,7 +84,18 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'localdb'),
     }
 }
-
+'''
+DATABASES = {
+      'default': {
+          'ENGINE': 'django.db.backends.postgresql_psycopg2',
+          'NAME': 'postgres',
+          'USER': 'postgres',
+          'PASSWORD': 'postgres',
+          'HOST': '',
+          'PORT': '5432',
+      }
+    }
+'''
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

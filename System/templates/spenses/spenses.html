@@ -35,27 +35,27 @@
                             {% if spense_page %}	
                                 {% for spense in spense_page %}
                                 <tr class="text-left">
-                                    <td>{{spense.company.name}}</td>
-                                    <td>{{spense.category.name}}</td>
-                                    <td>{{spense.supplier.name}}</td>
-                                    <td>{{spense.amount}}</td>
-                                    <td><i class="fa fa-calendar"></i>&nbsp;{{spense.date|date:"Y-m-d"}}</td>
-                                    <td>{{spense.iva.name}}</td>
+                                    <td style="vertical-align: middle;">{{spense.company.name}}</td>
+                                    <td style="vertical-align: middle;">{{spense.category.name}}</td>
+                                    <td style="vertical-align: middle;">{{spense.supplier.name}}</td>
+                                    <td style="vertical-align: middle;">{{spense.amount}}</td>
+                                    <td style="vertical-align: middle;"><i class="fa fa-calendar"></i>&nbsp;{{spense.date|date:"Y-m-d"}}</td>
+                                    <td style="vertical-align: middle;">{{spense.iva.name}}</td>
                                     {% if spense.file %}
-                                        <td class="align-middle"><a href="{{spense.file.url}}" target="_blank"><i class="fa fa-file-pdf-o"></i>&nbsp;{{spense.file|truncatechars:35}}</a></td>            
+                                        <td style="vertical-align: middle;"><a href="{{spense.file.url}}" target="_blank"><i class="fa fa-file-pdf-o"></i>&nbsp;{{spense.file|truncatechars:35}}</a></td>            
                                     {% else %}
-                                        <td class="align-middle"></td> 
+                                        <td style="vertical-align: middle;color:red;" onclick="showBasicMessage()"><span style='font-size:20px; color:red;'>&#9888;</span>&nbsp;&nbsp;No existe factura !</td> 
                                     {% endif %}
-                                    <td class="text-center" style="vertical-align: middle">
+                                    <td class="text-center" style="vertical-align: middle;">
                                         <a href="{% url 'spensesupdate' spense.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
                                         <a href="#" data-toggle="modal" data-target="#delete-spenses{{spense.id}}"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
                                 <!--Delete Spenses-->
 								<div class="modal fade" id="delete-spenses{{spense.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-									<div class="modal-dialog modal-xs">
+									<div class="modal-dialog" role="document">
 										<div class="modal-content" style="border-radius: 15px;">
-											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+											<div class="modal-header" style="background-color: #489ee7; border-top-right-radius: 10px; border-top-left-radius: 10px;">
 												<div class="align-items-center">
 													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR GASTOS</p>
 												</div>
@@ -70,8 +70,8 @@
 											</div>
 											<div class="modal-footer">
                                                 <center>
-                                                    <button id="delete-button{{spense.id}}" class="btn btn-primary">SI</button>
-                                                    <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                    <button id="delete-button{{spense.id}}" class="btn btn-primary waves-effect">SI</button>
+                                                    <button data-dismiss="modal" class="btn btn-danger" data-dismiss="modal">NO</button>
                                                 </center>
 											</div>
 										</div>
@@ -96,6 +96,10 @@
 											}
 										});
 									});
+
+                                    function showBasicMessage() {
+                                        swal("Cargue el archivo de factura!", "", "error")
+                                    }
 								</script>
                                 {% endfor %}
                             {% else %}

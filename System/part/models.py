@@ -74,7 +74,7 @@ class Spenses(models.Model):
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
-    amount = models.TextField(blank=True)
+    amount = models.CharField(max_length=30, blank=True, null=True)
     date = models.DateField(null=True, blank=True)
     file = models.FileField(upload_to=invoice_file, blank=True, null=True)
     iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
