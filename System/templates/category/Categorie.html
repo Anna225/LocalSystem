@@ -8,86 +8,101 @@
 {% block content %}
     <section class="content">
         <div class="container-fluid">
-            <div class="header">
-                <a class="btn btn-primary" href="">AÑADIR Categorie</a>
-                <h2>Categorie</h2>
-            </div>
+            
             <!-- Basic Examples -->
             <div class="row clearfix">
-                <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
-                    <div class="card">
-                        <div class="body">
-                            <div class="list-unstyled row clearfix">
-                                <h3 class="text-center">Company</h3>
-                                <center>
-                                    <a href="{% url 'index' %}">
-                                        <i class="material-icons" style="font-size:100px;">business_center</i>    
-                                    </a>
-                                </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">New</button>
-                                </div>
-                            </div>
-                        </div>   
+                <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
+                    <div class="header">
+                        <a class="btn btn-primary" href="{% url 'categoryadd' %}">AÑADIR CATEGORIE</a>
+                        <h2>CATEGORIE</h2>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
-                    <div class="card">
-                        <div class="body" style="padding: 20px 60px">
-                            <div class="list-unstyled row clearfix">
-                                <h3 class="text-center">Company</h3>
-                                <center>
-                                    <a href="{% url 'index' %}">
-                                        <i class="material-icons" style="font-size:100px;">public</i>    
-                                    </a>
-                                </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">Petrol</button>
-                                </div>
-                            </div>
-                        </div>   
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
-                    <div class="card">
-                        <div class="body" style="padding: 20px 60px">
-                            <div class="list-unstyled row clearfix">
-                            <h3 class="text-center">Company</h3>
-                                <center>
-                                    <a href="{% url 'index' %}">
-                                        <i class="material-icons" style="font-size:100px;">bookmark_border</i>    
-                                    </a>
-                                </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">Informatic</button>
-                                </div>
-                            </div>
-                        </div>   
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
-                    <div class="card">
-                        <div class="body" style="padding: 20px 60px">
-                            <div class="list-unstyled row clearfix">
-                            <h3 class="text-center">Company</h3>
-                                <center>
-                                    <a href="{% url 'index' %}">
-                                        <i class="material-icons" style="font-size:100px;">contacts</i>    
-                                    </a>
-                                </center>
-                                <h5 class="text-center">1</h5>
-                                <h5 class="text-center">Our Companies</h5>
-                                <div class="col-lg-12">
-                                    <button id="submit" class="btn btn-primary" type="submit">Telephone</button>
-                                </div>
-                            </div>
-                        </div>   
+                    <div class="card" style="padding: 10px;">
+                        <div style="padding: 10px; width:30%;">
+                            <input id="search_category" type="search" class="form-control" placeholder="Buscar">
+                        </div>
+                        <table class="table color-table primary-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Categorie</th>
+                                    <th scope="col" class="text-center">Modificar</th>
+                                </tr>
+                            </thead>
+                            <tbody>	
+                            {% if categorys %}	
+                                {% for category in categorys %}
+                                <tr class="text-left">
+                                    <td class="text-left">{{category.name}}</td>                                
+                                    <td class="text-center" style="vertical-align: middle">
+                                        <a href="{% url 'categoryupdate' category.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
+                                        <a href="#" data-toggle="modal" data-target="#delete-category{{category.id}}"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                                <!--Delete Category-->
+								<div class="modal fade" id="delete-category{{category.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+									<div class="modal-dialog modal-xs">
+										<div class="modal-content" style="border-radius: 15px;">
+											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+												<div class="align-items-center">
+													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR CATEGORIE</p>
+												</div>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true" style="color: #fff;">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												<div class="col-12">
+													<h5>¿Está seguro que quiere eliminar este registro?</h5>
+												</div>
+											</div>
+											<div class="modal-footer">
+                                                <center>
+                                                    <button id="delete-button{{category.id}}" class="btn btn-primary">SI</button>
+                                                    <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                </center>
+											</div>
+										</div>
+									</div>
+								</div>
+								<script>
+									$('#delete-button{{category.id}}').click(function(e){
+										var value = '{{category.id}}';
+										var url = "{% url 'delete_category' %}";
+										var token = '{{csrf_token}}';
+										$.ajax({
+											headers: { "X-CSRFToken": token },
+											method: 'POST',
+											url: url,
+											data: {
+												'value': value
+											},
+											success: function(data) {
+												if(data == 'Ok') {
+													location.reload();
+												}
+											}
+										});
+									});
+								</script>
+                                {% endfor %}
+                            {% else %}
+                                <td style="padding-bottom:30px;">No existen Categorie</td>
+							{% endif %}
+                            </tbody>
+                        </table>
+                        <script>
+                            $("#search_category").keyup(function(){
+                                _this = this;
+                                // Show only matching TR, hide rest of them
+                                $.each($("table tbody tr"), function() {
+                                    if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1){
+                                        $(this).hide();
+                                    }
+                                    else {
+                                        $(this).show();
+                                    }
+                                });
+                            });
+			            </script>
                     </div>
                 </div>
             </div>

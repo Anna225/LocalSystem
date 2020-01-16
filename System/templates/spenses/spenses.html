@@ -11,8 +11,8 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="header">
-                        <a class="btn btn-primary" href="{% url 'spensesadd' %}"><i class="fa fa-plus-circle"></i>&nbsp; AÑADIR SPENSES</a>
-                        <h2 style="padding-top:12px;">SPENSES</h2>
+                        <a class="btn btn-primary" href="{% url 'spensesadd' %}"><i class="fa fa-plus-circle"></i>&nbsp; AÑADIR GASTOS</a>
+                        <h2 style="padding-top:12px;">GASTOS</h2>
                     </div>
                     <div class="card" style="padding: 10px;">
                         <div style="padding: 10px; width:20%;">
@@ -23,7 +23,7 @@
                                 <tr>
                                     <th scope="col">Empresa</th>
                                     <th scope="col">Categorie</th>
-                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Proovedor</th>
                                     <th scope="col">Cantidad</th>
                                     <th scope="col">Fecha</th>
                                     <th scope="col">IVA</th>
@@ -36,7 +36,7 @@
                                 {% for spense in spense_page %}
                                 <tr class="text-left">
                                     <td>{{spense.company.name}}</td>
-                                    <td>{{spense.company.name}}</td>
+                                    <td>{{spense.category.name}}</td>
                                     <td>{{spense.supplier.name}}</td>
                                     <td>{{spense.amount}}</td>
                                     <td><i class="fa fa-calendar"></i>&nbsp;{{spense.date|date:"Y-m-d"}}</td>
@@ -57,7 +57,7 @@
 										<div class="modal-content" style="border-radius: 15px;">
 											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
 												<div class="align-items-center">
-													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR SPENSES</p>
+													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR GASTOS</p>
 												</div>
 												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 													<span aria-hidden="true" style="color: #fff;">&times;</span>

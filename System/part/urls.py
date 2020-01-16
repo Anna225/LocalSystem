@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from System.part import views as part_view
-from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist, banklist, bankadd, bankdetail, bankupdate
+from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist, banklist, bankadd, bankdetail, bankupdate, category, categoryadd, categoryupdate, statistic
 from .views import companyupdate, supplierupdate, spensesupdate
 
 from django.contrib.auth.views import PasswordResetView 
@@ -36,7 +36,10 @@ urlpatterns = [
     url(r'^spensesadd/$', spensesadd.as_view(), name='spensesadd'),
     url(r'^spensesupdate/(?P<pk>\d+)/$', spensesupdate.as_view(), name='spensesupdate'),
     url(r'^delete_spense/$', part_view.delete_spense, name='delete_spense'),
-    path('Categorie/', part_view.Categorie, name='Categorie'),
+    path('category/', category.as_view(), name='category'),
+    path('categoryadd/', categoryadd.as_view(), name='categoryadd'),
+    url(r'^delete_category/$', part_view.delete_category, name='delete_category'),
+    url(r'^categoryupdate/(?P<pk>\d+)/$', categoryupdate.as_view(), name='categoryupdate'),
     url(r'^userlist/$', userlist.as_view(), name='userlist'),
     url(r'^delete_user/$', part_view.delete_user, name='delete_user'),
     url(r'^detect_new_user/$', part_view.detect_new_user, name='detect_new_user'),
@@ -53,5 +56,6 @@ urlpatterns = [
     url(r'^add_bank_flag/$', part_view.add_bank_flag, name='add_bank_flag'),
     url(r'^delete_bank/$', part_view.delete_bank, name='delete_bank'),
     url(r'^bank_update/(?P<pk>\d+)/$', bankupdate.as_view(), name='bankupdate'),
+    url(r'^statistic/$', statistic.as_view(), name='statistic'),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

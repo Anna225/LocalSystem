@@ -44,7 +44,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card">
                         <div class="header">
-                            <h2>Nuevo Spenses</h2>
+                            <h2>Nuevo Gastos</h2>
                         </div>
                         <form action="." id="spenses" method="post" target="_parent" enctype='multipart/form-data'>
                             {% csrf_token %}
@@ -68,7 +68,12 @@
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Categorie</label>
-                                            <input id="address" name="address" type="text" class="form-control" placeholder="Dirección" required="True">
+                                            <select id="category" name='category' class="form-control" required>
+                                                <option value="">----------------------------</option>
+                                                {% for category in categorys %}
+                                                    <option value={{category.id}}>{{ category }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Fecha</label><br>
@@ -77,7 +82,7 @@
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Supplier</label>
+                                            <label>Proovedor</label>
                                             <select id="supplier" name='supplier' class="form-control" required>
                                                 <option value="">----------------------------</option>
                                                 {% for supplier in suppliers %}
@@ -89,10 +94,11 @@
                                             <label>Factura</label>
                                             <div class="custom-file">
                                                 <label id="pdf-file-input" class="custom-file-label" for="file"><i class="fa fa-file"></i>&nbsp;&nbsp;Añadir Factura</label>
-                                                <input type='file' class='custom-file-input' id='invoice' name='file'/>
+                                                <input type='file' class='custom-file-input' id='invoice' name='file' required/>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>IVA</label>
@@ -104,6 +110,7 @@
                                             </select>
                                         </div>
                                     </div>  
+                                    <input type="hidden" value="{{ user.id }}" name="user">
                                 </div>
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">

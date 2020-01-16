@@ -15,6 +15,12 @@ def content_file_user(instance, filename):
 def content_file_supplier(instance, filename):
     return 'supplier/{1}'.format(instance, filename)
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return self.name
+
 class Company(models.Model):
     name = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=16, blank=True, null=True)
@@ -47,19 +53,6 @@ class Supplier(models.Model):
     def __str__(self):
         return self.name
 
-
-class Spenses(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
-    amount = models.TextField(blank=True)
-    date = models.DateField(null=True, blank=True)
-    file = models.FileField(upload_to=invoice_file, blank=True, null=True)
-    iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
-    flag = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return self.amount
-
 class User(AbstractUser):
     picture = models.ImageField(upload_to=content_file_user, blank=True)
     telephone = models.IntegerField(blank=True, null=True)
@@ -77,6 +70,20 @@ class User(AbstractUser):
     class Meta:
         permissions = (("admin_user","Can use modules admin"),("guest_user","Can use modules guest"))
 
+class Spenses(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
+    amount = models.TextField(blank=True)
+    date = models.DateField(null=True, blank=True)
+    file = models.FileField(upload_to=invoice_file, blank=True, null=True)
+    iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
+    flag = models.IntegerField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return self.amount
+
 class Bank(models.Model):
     supplier_name = models.CharField(max_length=100, blank=True, null=True)
     date = models.DateField(null=True, blank=True)
@@ -84,7 +91,8 @@ class Bank(models.Model):
     flag = models.IntegerField(blank=True, null=True)
     bank_search_start = models.DateField(null=True, blank=True)
     bank_search_end = models.DateField(null=True, blank=True)
-
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    
     def __str__(self):
         return self.supplier_name
 
@@ -99,5 +107,8 @@ class BankData(models.Model):
 
     def __str__(self):
         return self.paid_name
+
+
+
 
 

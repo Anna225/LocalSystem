@@ -109,25 +109,30 @@
                 {% endif %}">
                 <a href="{% url 'supplier' %}">
                         <i class="material-icons">public</i>
-                        <span>Suppiler</span>
+                        <span>Proovedor</span>
                     </a>
                 </li>
-                <li class="{% if 'Categorie' in request.path %}
+                <li class="{% if 'category' in request.path %}
                     active
                 {% endif %}">
-                <a href="{% url 'Categorie' %}">
+                <a href="{% url 'category' %}">
                         <i class="material-icons">bookmark_border</i>
                         <span>Categorie</span>
                     </a>
                 </li>
                 <li class="{% if 'spenses' in request.path %}active{% endif %}">
                     <a href="{% url 'spenses' %}"><i class="material-icons">shopping_cart</i>
-                        <span>Spenses</span>
+                        <span>Gastos</span>
                     </a>
                 </li> 
+                <li class="{% if 'statistic' in request.path %}active{% endif %}">
+                    <a href="{% url 'statistic' %}"><i class="material-icons">assessment</i>
+                        <span>Estadisticas</span>
+                    </a>
+                </li>
                 <li class="{% if 'bank' in request.path %}active{% endif %}">
                     <a href="{% url 'banklist' %}"><i class="material-icons">report</i>
-                        <span>Factura bancaria</span>
+                        <span>Bancos</span>
                     </a>
                 </li> 
                 <li class="{% if 'personallist' in request.path %}

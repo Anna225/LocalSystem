@@ -44,7 +44,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card">
                         <div class="header">
-                            <h2>Actualizar Spenses</h2>
+                            <h2>Actualizar Gastos</h2>
                         </div>
                         <form action="." id="spenses_update" method="POST" target="_parent" enctype='multipart/form-data'>
                             {% csrf_token %}
@@ -64,7 +64,8 @@
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Categorie</label>
-                                            <input id="address" name="address" type="text" class="form-control" placeholder="Dirección" required="True">
+                                            <select class="form-control" {{form.category}}
+                                            </select>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Fecha</label><br>
@@ -73,7 +74,7 @@
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Supplier</label>
+                                            <label>Proovedor</label>
                                             <select class="form-control" {{form.supplier}}
                                             </select>
                                         </div>
@@ -102,6 +103,7 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <input type="hidden" value="{{ user.id }}" name="user">
                                 </div>
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">

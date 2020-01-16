@@ -5,15 +5,15 @@ from django.contrib.auth.hashers import make_password
 from System.part.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from System.part.models import Company, Supplier, Spenses, IVA, Bank, BankData
+from System.part.models import Company, Supplier, Spenses, IVA, Bank, BankData, Category
 from cities_light.models import Country
 import os
 
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from django.utils.decorators import method_decorator
 from django.urls import reverse, reverse_lazy
-from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm, BankForm
+from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm, BankForm, CategoryForm
 
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -22,6 +22,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import FormView, RedirectView
 
 import pandas as pd
+from django.db.models import Sum, Count
 
 # Create your views here.
 
@@ -264,7 +265,11 @@ class supplierupdate(UpdateView):
 
 @login_required
 def spenses(request):
-    spenses = Spenses.objects.all().order_by('date')
+    if request.user.is_staff == True:
+        spenses = Spenses.objects.all().order_by('date')
+    else:
+        spenses = Spenses.objects.filter(user_id=request.user.id).order_by('date')
+    
     page = request.GET.get('page', 1)
     paginator = Paginator(spenses, 10)
     try:
@@ -292,10 +297,12 @@ class spensesadd(CreateView):
         context = super(spensesadd, self).get_context_data(**kwargs)
         company = Company.objects.all()
         supplier = Supplier.objects.all()
+        category = Category.objects.all()
         iva = IVA.objects.all()
 
         context["companys"] = company
         context["suppliers"] = supplier
+        context["categorys"] = category
         context["ivas"] = iva
         return context
 
@@ -311,10 +318,36 @@ class spensesupdate(UpdateView):
         context['file'] = Spenses.objects.get(pk=self.kwargs.get('pk'))
         return context
 
-@login_required
-def Categorie(request):
-    country = Country.objects.all()
-    return render(request, 'category/Categorie.html', {'country':country})
+@method_decorator(login_required, name='dispatch')
+class category(ListView):
+    model = Category
+    fields = "__all__"
+    template_name = "category/Categorie.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categorys'] = Category.objects.all()
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class categoryadd(CreateView):
+    model = Category
+    fields = "__all__"
+    template_name = "category/categoryadd.html"
+    success_url = reverse_lazy('category')
+
+def delete_category(request):
+    my_id = request.POST.get('value')
+    category = Category.objects.get(id=my_id)
+    category.delete()
+    return HttpResponse('Ok')
+
+@method_decorator(login_required, name='dispatch')
+class categoryupdate(UpdateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = "category/update_category.html"
+    success_url = reverse_lazy('category')
 
 @method_decorator(login_required, name='dispatch')
 class userinformation(ListView):
@@ -353,7 +386,7 @@ class banklist(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(banklist, self).get_context_data(**kwargs)
-        bank = Bank.objects.all().order_by('date')
+        bank = Bank.objects.filter(user_id=self.request.user.pk).order_by('date')
         paginator = Paginator(bank, 10)
         page = self.request.GET.get('page')
         page_obj = paginator.get_page(page)
@@ -425,12 +458,10 @@ class bankdetail(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['bankdatas'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first')
+        context['bankdatas'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk'), amount__lt=0).order_by('date_first')
         bank_date = Bank.objects.get(pk=self.kwargs.get('pk'))
         context['value'] = self.kwargs.get('pk')
-        #context['spenses'] = Spenses.objects.all()
-        context['spenses'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date')
-        #print("+++++++++++++++++", BankData.objects.filter(bank_num_id=self.kwargs.get('pk')))
+        context['spenses'] = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date')
         #context['spenses_all'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date').count()
         #context['bankdatas_all'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first').count()
         bank_except = BankData.objects.exclude(amount__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).values_list('amount', flat=True), date_first__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).values_list('date', flat=True)).all()
@@ -443,7 +474,7 @@ class bankdetail(ListView):
                 bank_except_detail.flag = True
                 bank_except_detail.save()
                 
-        spenses_except = Spenses.objects.exclude(amount__in=BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).values_list('amount', flat=True),date__in=BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).values_list('date_first', flat=True)).all()
+        spenses_except = Spenses.objects.exclude(amount__in=BankData.objects.filter(bank_num_id=self.kwargs.get('pk'), amount__lt=0).values_list('amount', flat=True),date__in=BankData.objects.filter(bank_num_id=self.kwargs.get('pk'), amount__lt=0).values_list('date_first', flat=True)).all()
         
         if spenses_except.count() != 0:
             for spenses_except_detail in spenses_except:
@@ -463,7 +494,7 @@ class bankdetail(ListView):
             start_date = request.POST.get('start_date')
             end_date = request.POST.get('end_date')
             value = request.POST.get('value')
-            spenses = Spenses.objects.filter(date__gte=start_date, date__lte=end_date).order_by('date')
+            spenses = Spenses.objects.filter(user_id=self.request.user.pk).filter(date__gte=start_date, date__lte=end_date).order_by('date')
 
             return render(request, 'bank/banksearch.html', {'spenses': spenses, 'start_date': start_date, 'end_date': end_date, 'value':value}) 
  
@@ -476,3 +507,88 @@ def delete_bank(request):
     bank = Bank.objects.get(id=my_id)
     bank.delete()
     return HttpResponse('Ok')
+
+@method_decorator(login_required, name='dispatch')
+class statistic(TemplateView):
+    
+    model = Spenses
+    fields = "__all__"
+    template_name = "statistic/statistic.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        statistics_spense = Spenses.objects.filter(user_id=self.request.user.pk).filter(amount__lt=0).count()
+        #print("===============", self.request.user.pk)
+        if statistics_spense != 0:
+
+            statis = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(category_id__isnull=True).values('category').annotate(dsum=Sum('amount')).order_by('-dsum')
+            array = [[]]
+            array.clear()
+            head = ['Category', 'Sum']
+            array.append(head)
+            sum = 0
+            for stat in statis:
+                temp = []
+                category_name = Category.objects.get(pk=stat['category'])
+                temp.append(str(category_name))
+                temp.append(abs(stat['dsum']))
+                array.append(temp)
+                sum += abs(stat['dsum'])
+
+            context["statistics_spenses"] = array
+            context["sum"] = sum
+        else:
+            array = [[]]
+            sum = 0
+            context["statistics_spenses"] = array
+            context["sum"] = sum
+
+        statistic_tax = Spenses.objects.filter(user_id=self.request.user.pk).filter(amount__lt=0).count()
+        if statistic_tax != 0:
+
+            statis = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(category_id__isnull=True).values('iva').annotate(dsum=Sum('amount')).order_by('-dsum')
+            array = [[]]
+            array.clear()
+            head = ['IVA', 'Sum']
+            array.append(head)
+            for stat in statis:
+                temp = []
+                iva_name = IVA.objects.get(pk=stat['iva'])
+                temp.append(str(iva_name))
+                temp.append(abs(stat['dsum']))
+                array.append(temp)
+
+            context["statistic_taxs"] = array
+        else:
+            array = [[]]
+            context["statistic_taxs"] = array
+        print()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            start = request.POST.get('start_date')
+            end = request.POST.get('end_date')
+
+            statistic = Spenses.objects.filter(date__gte=start, date__lte=end).count()
+            if statistic != 0:
+                statis = Spenses.objects.filter(date__gte=start, date__lte=end).values('category').annotate(dsum=Sum('amount')).order_by('-dsum')
+                array = [[]]
+                array.clear()
+                head = ['Category', 'Sum']
+                array.append(head)
+                for stat in statis:
+                    temp = []
+                    category_name = Category.objects.get(pk=stat['category'])
+                    temp.append(str(category_name))
+                    temp.append(abs(stat['dsum']))
+                    array.append(temp)
+
+                return render(request, 'statistic/statistic.html', {'statistics': array, 'start':start, 'end':end})
+
+            else:
+                array = [[]]
+                return render(request, 'statistic/statistic.html', {'statistics': array,'start':start, 'end':end})
+
+
+    

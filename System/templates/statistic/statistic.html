@@ -1,0 +1,136 @@
+{% extends 'basic.html' %}
+
+{% block style %}
+    {% load static %}
+    <!-- Sweetalert Css -->
+    <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                    <div class="header">
+                        <h2>ESTADISTICAS</h2>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <h4>Gastos</h4>
+                        <div class="card" style="padding: 10px;">
+                            <!--form action="." method="post" target="_parent" enctype='multipart/form-data'>
+                                {% csrf_token %}
+                                <div style="padding: 15px; width:100%;">
+                                    <div class="list-unstyled row clearfix">
+                                        <div class="col-lg-2" style="text-align:right;">
+                                            <label>INICIO: </label>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                            <input id="start_date" name="start_date" value="{{start}}" required/>	
+                                        </div>
+                                        <div class="col-lg-2" style="text-align:right;">
+                                            <label>FIN: </label>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                            <input id="end_date" name="end_date" value="{{end}}" required/>
+                                        </div>
+                                        <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                            <button type="submit" class="btn btn-primary">Buscar</button>
+                                        </div> 
+                                    </div>
+                                </div>
+                            </form-->
+                            <center>
+                                <div id="piechart_3d_paid" style="width: 700px; height: 500px;"></div>
+                            </center>
+                        </div>
+                        
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <h4>Tax</h4>
+                        <div class="card" style="padding: 10px;">
+                            <!--form action="." method="post" target="_parent" enctype='multipart/form-data'>
+                                {% csrf_token %}
+                                <div style="padding: 15px; width:100%;">
+                                    <div class="list-unstyled row clearfix">
+                                        <div class="col-lg-2" style="text-align:right;">
+                                            <label>INICIO: </label>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                            <input id="start_date" name="start_date" value="{{start}}" required/>	
+                                        </div>
+                                        <div class="col-lg-2" style="text-align:right;">
+                                            <label>FIN: </label>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                            <input id="end_date" name="end_date" value="{{end}}" required/>
+                                        </div>
+                                        <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
+                                            <button type="submit" class="btn btn-primary">Buscar</button>
+                                        </div> 
+                                    </div>
+                                </div>
+                            </form-->
+                            <center>
+                                <div id="statistic_tax" style="width: 700px; height: 500px;"></div>
+                            </center>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+        $('#start_date').datepicker({
+            format: 'yyyy-mm-dd',
+            maxDate: function () {
+            return $('#end_date').val();
+            }
+        });
+        $('#end_date').datepicker({
+            format: 'yyyy-mm-dd',
+            minDate: function () {
+            return $('#start_date').val();
+        }
+        });
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      var array_positive = {{statistics_spenses|safe}};
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(array_positive);
+
+        var options = {
+          title: 'Cantidad total:  {{sum}}',
+          is3D: true,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d_paid'));
+        chart.draw(data, options);
+      }
+    </script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      var array_tax = {{statistic_taxs|safe}};
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(array_tax);
+
+        var options = {
+          title: '',
+          is3D: true,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('statistic_tax'));
+        chart.draw(data, options);
+      }
+    </script>
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+{% endblock %}

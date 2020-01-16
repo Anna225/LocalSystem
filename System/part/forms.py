@@ -1,5 +1,5 @@
 from django import forms
-from System.part.models import Company, Supplier, Spenses, Bank
+from System.part.models import Company, Supplier, Spenses, Bank, Category
 from cities_light.models import Country
 from System.part.models import User
 
@@ -53,7 +53,7 @@ class SupplierForm(forms.ModelForm):
 class SpensesForm(forms.ModelForm):
     class Meta:
         model = Spenses
-        fields = ('amount', 'date', 'company', 'supplier', 'file', 'iva')
+        fields = ('amount', 'date', 'company', 'supplier','category', 'file', 'iva', 'user')
         widgets = {
             'amount': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'amount', 'id':'amount', 'required':True}),
             'file': forms.FileInput(attrs={'class':'custom-file-input'}),
@@ -73,7 +73,15 @@ class UserForm(forms.ModelForm):
 class BankForm(forms.ModelForm):
     class Meta:
         model = Bank
-        fields = ('date', 'bank_search_start', 'supplier_name', 'invoice_name', 'bank_search_end')
+        fields = ('date', 'bank_search_start', 'supplier_name', 'user', 'invoice_name', 'bank_search_end')
         widgets = {
             'invoice_name': forms.FileInput(attrs={'class':'custom-file-input'}),
+        }
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ('name',)
+        widgets = {
+            'name': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'name', 'id':'name', 'required':True}),
         }

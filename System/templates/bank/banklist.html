@@ -23,7 +23,7 @@
                                 <tr>
                                     <th scope="col">FECHA</th>
                                     <th scope="col">Factura bancaria</th>
-                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Proovedor</th>
                                     <th scope="col">Comienzo</th>
                                     <th scope="col">Final</th>
                                     <th scope="col"></th>
@@ -35,24 +35,24 @@
                             {% if banks %}	
                                 {% for bank in banks %}
                                 <tr class="text-left">
-                                    <td class="text-left"><i class="fa fa-calendar"></i>&nbsp;{{bank.date|date:"Y-m-d"}}</td> 
+                                    <td class="text-left" style="vertical-align: middle;"><i class="fa fa-calendar"></i>&nbsp;{{bank.date|date:"Y-m-d"}}</td> 
                                     {% if bank.invoice_name %}
-                                        <td class="text-left"><a href="{{bank.invoice_name.url}}"><i class="fa fa-download"></i>&nbsp;{{bank.invoice_name|truncatechars:30}}</a></td>
+                                        <td class="text-left" style="vertical-align: middle;"><a href="{{bank.invoice_name.url}}"><i class="fa fa-download"></i>&nbsp;{{bank.invoice_name|truncatechars:30}}</a></td>
                                     {% else %}
                                         <td></td>
                                     {% endif %}
-                                    <td class="text-left">{{bank.supplier_name}}</td>
-                                    <td class="text-left"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_start|date:"Y-m-d"}}</td> 
-                                    <td class="text-left"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_end|date:"Y-m-d"}}</td> 
+                                    <td class="text-left" style="vertical-align: middle;">{{bank.supplier_name}}</td>
+                                    <td class="text-left" style="vertical-align: middle;"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_start|date:"Y-m-d"}}</td> 
+                                    <td class="text-left" style="vertical-align: middle;"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_end|date:"Y-m-d"}}</td> 
                                     {% if bank.flag != True %}        
-                                        <td><button type="button" id="write{{bank.id}}" class="btn btn-danger">Escribir</a></td>
+                                        <td style="vertical-align: middle;"><button type="button" id="write{{bank.id}}" class="btn btn-danger">Comparar con Gastos</a></td>
                                     {% else %}
-                                        <td></td>
+                                        <td style="vertical-align: middle;"></td>
                                     {% endif %} 
                                     {% if bank.flag == True %}
-                                        <td><a href="{% url 'bankdetail' bank.id %}" class="btn btn-primary">Ver</a></td> 
+                                        <td style="vertical-align: middle;"><a href="{% url 'bankdetail' bank.id %}" class="btn btn-primary">Mostrar comparativa</a></td> 
                                     {% else %}     
-                                        <td></td>
+                                        <td style="vertical-align: middle;"></td>
                                     {% endif %}                    
                                     <td class="text-center" style="vertical-align: middle">
                                         <a href="{% url 'bankupdate' bank.id %}"><i class="fa fa-pencil"></i></a>&nbsp;

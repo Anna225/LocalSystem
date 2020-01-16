@@ -22,6 +22,7 @@
                             <table class="table color-table primary-table">
                                 <thead>
                                     <tr>
+                                        <th scope="col"></th>
                                         <th scope="col">FECHA</th>
                                         <th scope="col">CONCEPTO</th>
                                         <th scope="col">FECHA VALOR</th>
@@ -34,6 +35,7 @@
                                     {% for bankdata in bankdatas %}
                                         {% if bankdata.flag != True %}
                                             <tr class="text-left">
+                                                <td class="text-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-blue" checked/><label style="vertical-align: middle;"></label></td>
                                                 <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
                                                 <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
                                                 <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
@@ -42,11 +44,12 @@
                                             </tr>
                                         {% else %}
                                             <tr class="text-left" style="color:red!important;">
-                                                <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
-                                                <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
-                                                <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
-                                                <td class="text-left">{{bankdata.amount}}</td> 
-                                                <td class="text-left">{{bankdata.balance}}</td>                   
+                                                <td class="text-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-pink" checked /><label style="vertical-align: middle;"></label></td>
+                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.date_first|date:"Y-m-d"}}</td> 
+                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.paid_name|truncatechars:30}}</td>   
+                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.date_second|date:"Y-m-d"}}</td>
+                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.amount}}</td> 
+                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.balance}}</td>                   
                                             </tr>
                                         {% endif %}
                                     {% endfor %}
@@ -73,7 +76,7 @@
                     </div>
 
                     <div class="col-lg-6">
-                        <h4>DATOS SPENSES</h4>
+                        <h4>GASTOS</h4>
                         <div id="search_hidden"></div>
                         <div class="card" style="padding: 10px;" id="search_spense">
                                 
@@ -98,9 +101,10 @@
                             <table class="table color-table primary-table">
                                 <thead>
                                     <tr>
+                                        <th scope="col"></th>
                                         <th scope="col">FECHA</th>
-                                        <th scope="col">Supplier</th>
-                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">CONCEPTO</th>
+                                        <th scope="col">IMPORTE</th>
                                         <th scope="col" class="text-center">Modificar</th>
                                     </tr>
                                 </thead>
@@ -109,20 +113,22 @@
                                     {% for spense in spenses %}
                                         {% if spense.flag != True %}
                                             <tr class="text-left">
+                                                <td class="text-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-blue" checked/><label style="vertical-align: middle;"></label></td>
                                                 <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
                                                 <td class="text-left">{{spense.supplier.name|truncatechars:30}}</td>   
                                                 <td class="text-left">{{spense.amount}}</td> 
-                                                <td class="text-center" style="vertical-align: middle">
+                                                <td class="text-center" style="vertical-align: middle;">
                                                     <a href="{% url 'spensesupdate' spense.id %}" target="_blank"><i class="fa fa-pencil"></i></a>&nbsp;
                                                     <a href="#" data-toggle="modal" data-target="#delete-spenses{{spense.id}}"><i class="fa fa-trash"></i></a>
                                                 </td>                  
                                             </tr>
                                         {% else %}
                                             <tr class="text-left" style="color:blue!important;">
-                                                <td class="text-left">{{spense.date|date:"Y-m-d"}}</td> 
-                                                <td class="text-left">{{spense.supplier.name|truncatechars:30}}</td>   
-                                                <td class="text-left">{{spense.amount}}</td>      
-                                                <td class="text-center" style="vertical-align: middle">
+                                                <td class="text-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-orange" checked/><label style="vertical-align: middle;"></label></td>
+                                                <td class="text-left" style="vertical-align: middle;">{{spense.date|date:"Y-m-d"}}</td> 
+                                                <td class="text-left" style="vertical-align: middle;">{{spense.supplier.name|truncatechars:30}}</td>   
+                                                <td class="text-left" style="vertical-align: middle;">{{spense.amount}}</td>      
+                                                <td class="text-center" style="vertical-align: middle;">
                                                     <a href="{% url 'spensesupdate' spense.id %}" target="_blank"><i class="fa fa-pencil"></i></a>&nbsp;
                                                     <a href="#" data-toggle="modal" data-target="#delete-spenses{{spense.id}}"><i class="fa fa-trash"></i></a>
                                                 </td>             
@@ -134,7 +140,7 @@
                                                 <div class="modal-content" style="border-radius: 15px;">
                                                     <div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
                                                         <div class="align-items-center">
-                                                            <p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR SPENSES</p>
+                                                            <p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR GASTOS</p>
                                                         </div>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true" style="color: #fff;">&times;</span>
@@ -176,7 +182,7 @@
                                         </script>
                                     {% endfor %}
                                 {% else %}
-                                    <td style="padding-bottom:30px;">No existen Spenses</td>
+                                    <td style="padding-bottom:30px;">No existen Gastos</td>
                                 {% endif %}
                                 </tbody>
                             </table>
