@@ -33,21 +33,21 @@
                             <tbody>	
                             {% if users %}	
                                 {% for user in users %}
-                                    <tr class="text-left">
+                                    <tr class="align-left">
                                         {% if user.picture %}
                                             <td><img src="{{user.picture.url}}" style="width: 30px; display: inline-block; border-radius: 50%;"></td>
                                         {% else %}
                                             <td><img style="width: 30px; display: inline-block; border-radius: 50%;" src="{% static 'images/avatar-default.jpg'%}"></td>
                                         {% endif %}
-                                        <td class="text-left">{{user.username}}</td>
-                                        <td class="text-left">{{user.first_name}}</td>
-                                        <td class="text-left">{{user.last_name}}</td>
-                                        <td class="text-left"><i class="fa fa-envelope-o"></i>&nbsp;{{user.email}}</td>
+                                        <td class="align-left">{{user.username}}</td>
+                                        <td class="align-left">{{user.first_name}}</td>
+                                        <td class="align-left">{{user.last_name}}</td>
+                                        <td class="align-left"><i class="fa fa-envelope-o"></i>&nbsp;{{user.email}}</td>
                                         
                                         {% if user.is_staff == True %}
-                                            <td class="bg-gray badge">Administración</td>
+                                            <td><span class="label bg-red">Administración</span></td>
                                         {% else %}
-                                            <td class="text-left">Usuario</td>
+                                            <td class="align-left">Usuario</td>
                                         {% endif %}
                                         {% if user.flag != True %}
                                             <td><button id="new{{user.id}}" class="btn btn-primary">New</button></td>
@@ -55,7 +55,7 @@
                                             <td></td>
                                         {% endif %}
                                         {% if user.is_staff == True %}   
-                                            <td class="text-center" style="vertical-align: middle">
+                                            <td class="align-center" style="vertical-align: middle">
                                                 <!--a href="#" data-toggle="modal" data-target="#delete-user{{user.id}}"><i class="fa fa-trash"></i></a-->
                                             </td>
                                         {% else %}
@@ -84,8 +84,8 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <center>
-                                                        <button id="delete-button{{user.id}}" class="btn btn-primary">SI</button>
-                                                        <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                        <button id="delete-button{{user.id}}" class="btn btn-primary waves-effect">SI</button>
+                                                        <button data-dismiss="modal" class="btn btn-danger waves-effect">NO</button>
                                                     </center>
                                                 </div>
                                             </div>

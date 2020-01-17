@@ -14,7 +14,7 @@
                         <h2>ESTADISTICAS</h2>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                        <h4>Gastos</h4>
+                        <h4><a href="{% url 'spenses' %}">Gastos</a></h4>
                         <div class="card" style="padding: 10px;">
                             <!--form action="." method="post" target="_parent" enctype='multipart/form-data'>
                                 {% csrf_token %}
@@ -45,7 +45,7 @@
                         
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                        <h4>Tax</h4>
+                        <h4><a href="{% url 'spenses' %}">Tax</a></h4>
                         <div class="card" style="padding: 10px;">
                             <!--form action="." method="post" target="_parent" enctype='multipart/form-data'>
                                 {% csrf_token %}
@@ -76,6 +76,16 @@
                         </div>
                     </div>
                     
+                </div>
+                <div class="col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <h4><a href="{% url 'spenses' %}">Factura</a></h4>
+                        <div class="card" style="padding: 10px;">
+                            <center>
+                                <div id="piechart_3d_invoice" style="width: 700px; height: 500px;"></div>
+                            </center>
+                        </div>
+                    </div>
                 </div>
                 
             </div>
@@ -128,6 +138,23 @@
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('statistic_tax'));
+        chart.draw(data, options);
+      }
+    </script>
+
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      var array_invoice = {{invoice|safe}};
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(array_invoice);
+
+        var options = {
+          title: '',
+          is3D: true,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d_invoice'));
         chart.draw(data, options);
       }
     </script>

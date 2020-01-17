@@ -96,11 +96,16 @@ class index(ListView):
         context = super(index, self).get_context_data(**kwargs)
         company = Company.objects.all().count()
         supplier = Supplier.objects.all().count()
-        spenses = Spenses.objects.all().count()
-        
+        spenses = Spenses.objects.filter(user_id=self.request.user.pk).count()
+        category = Category.objects.all().count()
+        bank = Bank.objects.filter(user_id=self.request.user.pk).count()
+
         context["company_num"] = company
         context["supplier_num"] = supplier
         context["spense_num"] = spenses
+        context["empty"] = Spenses.objects.filter(user_id=self.request.user.pk).exclude(file__exact="").count()
+        context['category_num'] = category
+        context['bank_num'] = bank
         
         return context
 
@@ -265,10 +270,10 @@ class supplierupdate(UpdateView):
 
 @login_required
 def spenses(request):
-    if request.user.is_staff == True:
-        spenses = Spenses.objects.all().order_by('date')
-    else:
-        spenses = Spenses.objects.filter(user_id=request.user.id).order_by('date')
+    #if request.user.is_staff == True:
+       # spenses = Spenses.objects.all().order_by('date')
+    #else:
+    spenses = Spenses.objects.filter(user_id=request.user.id).order_by('date')
     
     page = request.GET.get('page', 1)
     paginator = Paginator(spenses, 10)
@@ -464,7 +469,8 @@ class bankdetail(ListView):
         context['spenses'] = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date')
         #context['spenses_all'] = Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).order_by('date').count()
         #context['bankdatas_all'] = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).order_by('date_first').count()
-        bank_except = BankData.objects.exclude(amount__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).values_list('amount', flat=True), date_first__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end).values_list('date', flat=True)).all()
+        bank_except = BankData.objects.filter(bank_num_id=self.kwargs.get('pk')).exclude(amount__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end, user_id=self.request.user.pk).values_list('amount', flat=True), date_first__in=Spenses.objects.filter(date__gte=bank_date.bank_search_start, date__lte=bank_date.bank_search_end, user_id=self.request.user.pk).values_list('date', flat=True)).all()
+
         for bank_date_temp in BankData.objects.filter(bank_num_id=self.kwargs.get('pk')):
             bank_date_temp.flag = False
             bank_date_temp.save()
@@ -494,7 +500,7 @@ class bankdetail(ListView):
             start_date = request.POST.get('start_date')
             end_date = request.POST.get('end_date')
             value = request.POST.get('value')
-            spenses = Spenses.objects.filter(user_id=self.request.user.pk).filter(date__gte=start_date, date__lte=end_date).order_by('date')
+            spenses = Spenses.objects.filter(user_id=self.request.user.pk, date__gte=start_date, date__lte=end_date).order_by('date')
 
             return render(request, 'bank/banksearch.html', {'spenses': spenses, 'start_date': start_date, 'end_date': end_date, 'value':value}) 
  
@@ -517,7 +523,7 @@ class statistic(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        statistics_spense = Spenses.objects.filter(user_id=self.request.user.pk).filter(amount__lt=0).count()
+        statistics_spense = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).count()
         #print("===============", self.request.user.pk)
         if statistics_spense != 0:
 
@@ -537,13 +543,32 @@ class statistic(TemplateView):
 
             context["statistics_spenses"] = array
             context["sum"] = sum
+
+            statistic_invoice = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(file__exact="").count()
+            statistic_invoice_empty = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, file__exact="").count()
+            invoice_head = ["Invoice", "Count"]
+            invoice_temp = []
+            invoice_temp.append("Factura")
+            invoice_temp.append(statistic_invoice)
+            
+            invoice_array = [[]]
+            invoice_array.clear()
+            invoice_array.append(invoice_head)
+            invoice_array.append(invoice_temp)
+            invoice_temper = []
+            invoice_temper.append("Vacío")
+            invoice_temper.append(statistic_invoice_empty)
+            invoice_array.append(invoice_temper)
+            context["invoice"] = invoice_array
         else:
             array = [[]]
             sum = 0
+            invoice_array = [[]]
             context["statistics_spenses"] = array
             context["sum"] = sum
+            context["invoice"] = invoice_array
 
-        statistic_tax = Spenses.objects.filter(user_id=self.request.user.pk).filter(amount__lt=0).count()
+        statistic_tax = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).count()
         if statistic_tax != 0:
 
             statis = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(category_id__isnull=True).values('iva').annotate(dsum=Sum('amount')).order_by('-dsum')
@@ -559,10 +584,11 @@ class statistic(TemplateView):
                 array.append(temp)
 
             context["statistic_taxs"] = array
+
         else:
             array = [[]]
             context["statistic_taxs"] = array
-        print()
+        
         return context
 
     def post(self, request, *args, **kwargs):

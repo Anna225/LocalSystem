@@ -14,7 +14,7 @@
                         <div class="header">
                             <h2>Añadir Empresa</h2>
                         </div>
-                        <form action="." id="company" method="post" target="_parent" enctype='multipart/form-data'>
+                        <form action="." id="company_add" method="post" target="_parent" enctype='multipart/form-data'>
                             {% csrf_token %}
                             <div class="body" style="padding: 20px 60px">
                                 <div class="list-unstyled row clearfix">
@@ -61,8 +61,8 @@
                                 </div>
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">
-                            <button id="submit" class="btn btn-primary" type="submit">ACTUALIZAR</button>    
-                            <a class="btn btn-danger" href="{% url 'companylist' %}">CANCELAR</a></center>
+                            <button id="submit" class="btn btn-primary waves-effect" type="submit">ACTUALIZAR</button>    
+                            <a class="btn btn-danger waves-effect" href="{% url 'companylist' %}">CANCELAR</a></center>
                         </div>
                         </form>
                     </div>

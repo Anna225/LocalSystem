@@ -45,12 +45,12 @@
                                     <td class="text-left" style="vertical-align: middle;"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_start|date:"Y-m-d"}}</td> 
                                     <td class="text-left" style="vertical-align: middle;"><i class="fa fa-calendar"></i>&nbsp;{{bank.bank_search_end|date:"Y-m-d"}}</td> 
                                     {% if bank.flag != True %}        
-                                        <td style="vertical-align: middle;"><button type="button" id="write{{bank.id}}" class="btn btn-danger">Comparar con Gastos</a></td>
+                                        <td style="vertical-align: middle;"><button type="button" id="write{{bank.id}}" class="btn btn-danger waves-effect">Comparar con Gastos</a></td>
                                     {% else %}
                                         <td style="vertical-align: middle;"></td>
                                     {% endif %} 
                                     {% if bank.flag == True %}
-                                        <td style="vertical-align: middle;"><a href="{% url 'bankdetail' bank.id %}" class="btn btn-primary">Mostrar comparativa</a></td> 
+                                        <td style="vertical-align: middle;"><a href="{% url 'bankdetail' bank.id %}" class="btn btn-primary waves-effect">Mostrar comparativa</a></td> 
                                     {% else %}     
                                         <td style="vertical-align: middle;"></td>
                                     {% endif %}                    
@@ -78,8 +78,8 @@
 											</div>
 											<div class="modal-footer">
                                                 <center>
-                                                    <button id="delete-button{{bank.id}}" class="btn btn-primary">SI</button>
-                                                    <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                    <button id="delete-button{{bank.id}}" class="btn btn-primary waves-effect">SI</button>
+                                                    <button data-dismiss="modal" class="btn btn-danger waves-effect">NO</button>
                                                 </center>
 											</div>
 										</div>

@@ -19,7 +19,7 @@
                             <div style="padding: 10px; width:40%;">
                                 <input id="search_bankdetail" type="search" class="form-control" placeholder="Buscar">
                             </div>
-                            <table class="table color-table primary-table">
+                            <table class="table table-bordered color-table primary-table">
                                 <thead>
                                     <tr>
                                         <th scope="col"></th>
@@ -34,22 +34,22 @@
                                 {% if bankdatas %}	
                                     {% for bankdata in bankdatas %}
                                         {% if bankdata.flag != True %}
-                                            <tr class="text-left">
-                                                <td class="text-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-blue" checked/><label style="vertical-align: middle;"></label></td>
-                                                <td class="text-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
-                                                <td class="text-left">{{bankdata.paid_name|truncatechars:30}}</td>   
-                                                <td class="text-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
-                                                <td class="text-left">{{bankdata.amount}}</td> 
-                                                <td class="text-left">{{bankdata.balance}}</td>                   
+                                            <tr class="align-left">
+                                                <td class="align-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-blue" checked/><label style="vertical-align: middle;"></label></td>
+                                                <td class="align-left">{{bankdata.date_first|date:"Y-m-d"}}</td> 
+                                                <td class="align-left">{{bankdata.paid_name|truncatechars:30}}</td>   
+                                                <td class="align-left">{{bankdata.date_second|date:"Y-m-d"}}</td>
+                                                <td class="align-left">{{bankdata.amount}}</td> 
+                                                <td class="align-left">{{bankdata.balance}}</td>                   
                                             </tr>
                                         {% else %}
-                                            <tr class="text-left" style="color:red!important;">
-                                                <td class="text-left" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-pink" checked /><label style="vertical-align: middle;"></label></td>
-                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.date_first|date:"Y-m-d"}}</td> 
-                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.paid_name|truncatechars:30}}</td>   
-                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.date_second|date:"Y-m-d"}}</td>
-                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.amount}}</td> 
-                                                <td class="text-left" style="vertical-align: middle;">{{bankdata.balance}}</td>                   
+                                            <tr class="align-left">
+                                                <td class="font-bold col-pink" style="vertical-align: middle;"><input type="checkbox" class="filled-in chk-col-pink" checked /><label style="vertical-align: middle;"></label></td>
+                                                <td class="font-bold col-pink" style="vertical-align: middle;">{{bankdata.date_first|date:"Y-m-d"}}</td> 
+                                                <td class="font-bold col-pink" style="vertical-align: middle;">{{bankdata.paid_name|truncatechars:30}}</td>   
+                                                <td class="font-bold col-pink" style="vertical-align: middle;">{{bankdata.date_second|date:"Y-m-d"}}</td>
+                                                <td class="font-bold col-pink" style="vertical-align: middle;">{{bankdata.amount}}</td> 
+                                                <td class="font-bold col-pink" style="vertical-align: middle;">{{bankdata.balance}}</td>                   
                                             </tr>
                                         {% endif %}
                                     {% endfor %}
@@ -94,11 +94,11 @@
                                     <input id="end_date" name="end_date" required/>
                                 </div>
                                 <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12" style="padding-bottom:10px;">
-                                    <button id="search_button" class="btn btn-primary">Buscar</button>
+                                    <button id="search_button" class="btn btn-primary waves-effect">Buscar</button>
                                 </div> 
                             </div>
 
-                            <table class="table color-table primary-table">
+                            <table class="table table-bordered color-table primary-table">
                                 <thead>
                                     <tr>
                                         <th scope="col"></th>
@@ -153,8 +153,8 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <center>
-                                                            <button id="delete-button{{spense.id}}" class="btn btn-primary">SI</button>
-                                                            <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                            <button id="delete-button{{spense.id}}" class="btn btn-primary waves-effect">SI</button>
+                                                            <button data-dismiss="modal" class="btn btn-danger waves-effect">NO</button>
                                                         </center>
                                                     </div>
                                                 </div>

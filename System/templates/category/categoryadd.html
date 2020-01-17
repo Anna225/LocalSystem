@@ -14,19 +14,23 @@
                         <div class="header">
                             <h2>Añadir Categorie</h2>
                         </div>
-                        <form action="." id="category" method="post" target="_parent" enctype='multipart/form-data'>
+                        <form action="." id="category" method="post" target="_parent" class="form-horizontal" enctype='multipart/form-data'>
                             {% csrf_token %}
                             <div class="body" style="padding: 20px 60px">
                                 <div class="list-unstyled row clearfix">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                        <label>Nombre de Categorie</label>
-                                        <input id="name" name="name" type="text" class="form-control" placeholder="Nombre de Categorie" required="True">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Nombre de Categorie</label>
+                                        <div class="col-sm-6">
+                                            <div class="form-line">
+                                                <input type="text" class="form-control" id="name" name="name" placeholder="Nombre de Categorie" required>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">
-                            <button id="submit" class="btn btn-primary" type="submit">ACTUALIZAR</button>    
-                            <a class="btn btn-danger" href="{% url 'category' %}">CANCELAR</a></center>
+                            <button id="submit" class="btn btn-primary waves-effect" type="submit">ACTUALIZAR</button>    
+                            <a class="btn btn-danger waves-effect" href="{% url 'category' %}">CANCELAR</a></center>
                         </div>
                         </form>
                     </div>

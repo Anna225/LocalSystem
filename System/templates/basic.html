@@ -23,6 +23,9 @@
     <link href="{% static 'theme/plugins/node-waves/waves.css' %}" rel="stylesheet" />
     <!-- Animation Css -->
     <link href="{% static 'theme/plugins/animate-css/animate.css' %}" rel="stylesheet" />
+    <!-- Dropzone Css -->
+    <link href="{% static 'theme/plugins/dropzone/dropzone.css' %}" rel="stylesheet">
+
     {% block style %}
     {% endblock %}
     <!-- Custom Css -->
@@ -78,6 +81,7 @@
                     <li><a href="{% url 'logout' %}"><i class="material-icons">input</i></a></li>
                 {% endif %}
             </ul>
+                    
         </div>
     </div>
 </nav>
@@ -172,6 +176,8 @@
 <script src="{% static 'theme/js/admin.js' %}"></script>
 
 <script src="{% static 'theme/js/demo.js' %}"></script>
+<!-- Dropzone Plugin Js -->
+<script href="{% static 'theme/plugins/dropzone/dropzone.js' %}"></script>
 
 <!-- SweetAlert Plugin Js -->
 <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>

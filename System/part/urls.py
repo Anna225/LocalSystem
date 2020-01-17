@@ -58,4 +58,5 @@ urlpatterns = [
     url(r'^bank_update/(?P<pk>\d+)/$', bankupdate.as_view(), name='bankupdate'),
     url(r'^statistic/$', statistic.as_view(), name='statistic'),
     
+    
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,7 +11,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="header">
-                        <a class="btn btn-primary" href="{% url 'supplieradd' %}"><i class="fa fa-plus-circle"></i>&nbsp; AÑADIR PROOVEDOR</a>
+                        <a class="btn btn-primary waves-effect" href="{% url 'supplieradd' %}"><i class="fa fa-plus-circle"></i>&nbsp; AÑADIR PROOVEDOR</a>
                         <h2 style="padding-top:12px;">PROOVEDOR</h2>
                     </div>
                     <div class="card" style="padding: 10px;">
@@ -38,9 +38,9 @@
                                 {% for supplier in suppliers %}
                                 <tr class="text-left">
                                     {% if supplier.picture %}
-                                        <td><img src="{{supplier.picture.url}}" draggable="false" width="auto" height="35" style="border-radius:50%"></td>
+                                        <td><img src="{{supplier.picture.url}}" draggable="false" width="35" height="35" style="border-radius:50%"></td>
                                     {% else %}
-                                        <td><img id="supplier-img-reload" draggable="false" src="{% static 'images/default.png' %}" width="auto" height="35" style="border-radius:50%" alt="" /></td>
+                                        <td><img id="supplier-img-reload" draggable="false" src="{% static 'images/default.png' %}" width="35" height="35" style="border-radius:50%" alt="" /></td>
                                     {% endif %}
                                     <td class="text-left">{{supplier.name}}</td>
                                     <td class="text-left">{{supplier.address}}</td>
@@ -74,8 +74,8 @@
 											</div>
 											<div class="modal-footer">
                                                 <center>
-                                                    <button id="delete-button{{supplier.id}}" class="btn btn-primary">SI</button>
-                                                    <button data-dismiss="modal" class="btn btn-danger">NO</button>
+                                                    <button id="delete-button{{supplier.id}}" class="btn btn-primary waves-effect">SI</button>
+                                                    <button data-dismiss="modal" class="btn btn-danger waves-effect">NO</button>
                                                 </center>
 											</div>
 										</div>

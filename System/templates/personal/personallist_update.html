@@ -110,7 +110,7 @@
                                             
                                             <div class="col-12 col-sm-6 col-md-6">
                                                 <label for="photo">Fotografía</label>
-                                                <div class="foto-img">
+                                                <div class="img-responsive thumbnail">
                                                     {% if user.picture %}
                                                         <img id="product-img-reload" draggable="false" src="{{ user.picture.url }}" alt="">
                                                     {% else %}
@@ -127,7 +127,7 @@
                                 </div>
                             </div>                 
                             <div class="col-12" style="text-align: center; padding-bottom: 50px;">    
-                                <button type="submit" class="btn btn-primary">GUADAR</button>
+                                <button type="submit" class="btn btn-primary waves-effect">GUADAR</button>
                             </div>
                         </form>
                     </div>
