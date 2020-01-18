@@ -18,6 +18,7 @@
                         <div style="padding: 10px; width:20%;">
                             <input id="search_spenses" type="search" class="form-control" placeholder="Buscar">
                         </div>
+                        <div class="body">
                         <table class="table color-table primary-table">
                             <thead>
                                 <tr>
@@ -70,8 +71,8 @@
 											</div>
 											<div class="modal-footer">
                                                 <center>
-                                                    <button id="delete-button{{spense.id}}" class="btn btn-primary waves-effect">SI</button>
-                                                    <button data-dismiss="modal" class="btn btn-danger waves-effect" data-dismiss="modal">NO</button>
+                                                    <button type="button" id="delete-button{{spense.id}}" class="btn btn-primary waves-effect">SI</button>
+                                                    <button type="button" data-dismiss="modal" class="btn btn-danger waves-effect" data-dismiss="modal">NO</button>
                                                 </center>
 											</div>
 										</div>
@@ -107,8 +108,18 @@
 							{% endif %}
                             
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th><strong>TOTAL</strong></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>{{sums_spense.amount__sum}}</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
                         </table>
-                        
+                        </div>
                         <script>
                             $("#search_spenses").keyup(function(){
                                 _this = this;

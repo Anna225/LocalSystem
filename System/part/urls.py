@@ -17,6 +17,7 @@ from django.contrib.auth.views import PasswordChangeView
 from .views import LoginView
 from .views import LogoutView
 
+
 urlpatterns = [
 
     path('', part_view.home, name='home' ),

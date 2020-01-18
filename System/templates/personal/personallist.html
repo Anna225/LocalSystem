@@ -3,16 +3,6 @@
     {% load static %}
     <!-- Sweetalert Css -->
     <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
-    <style>
-        .foto-img {
-            background-color: #fff;
-            border: solid 1px #ced4da;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
 {% endblock %}
 {% block content %}
     <section class="content">
@@ -25,9 +15,13 @@
                         <div class="profile-body">
                             <div class="image-area">
                                 {% if user.picture %}
-                                    <img src="{{user.picture.url}}" draggable="false" alt="" width="70%" />
+                                    <a href="{{user.picture.url}}" data-sub-html="Demo Description" target="_blank">
+                                        <img src="{{user.picture.url}}" draggable="false" alt="" width="70%" />
+                                    </a>
                                 {% else %}
-                                    <img src="{% static 'images/avatar-default.jpg' %}" width="60%" draggable="false">
+                                    <a href="{% static 'images/avatar-default.jpg' %}" data-sub-html="Demo Description" target="_blank">
+                                        <img src="{% static 'images/avatar-default.jpg' %}" width="70%" draggable="false">
+                                    </a>
                                 {% endif %}
                             </div>
                             <div class="content-area">

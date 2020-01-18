@@ -274,7 +274,7 @@ def spenses(request):
        # spenses = Spenses.objects.all().order_by('date')
     #else:
     spenses = Spenses.objects.filter(user_id=request.user.id).order_by('date')
-    
+    sums_spense = Spenses.objects.filter(user_id=request.user.id).aggregate(Sum("amount"))
     page = request.GET.get('page', 1)
     paginator = Paginator(spenses, 10)
     try:
@@ -283,7 +283,7 @@ def spenses(request):
         spense_page = paginator.page(1)
     except EmptyPage:
         spense_page = paginator.page(paginator.num_pages)
-    return render(request, 'spenses/spenses.html', {'spense_page':spense_page})
+    return render(request, 'spenses/spenses.html', {'spense_page':spense_page, 'sums_spense':sums_spense})
 
 def delete_spense(request):
     my_id = request.POST.get('value')
