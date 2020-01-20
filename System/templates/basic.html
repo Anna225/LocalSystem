@@ -70,7 +70,7 @@
             <a href="{% url 'index' %}"><img style="margin-left: 20px;width: 100px;" draggable="false" src="{% static 'images/header_logo.png'%}"></a>
         </div>
         <div class="collapse navbar-collapse" id="navbar-collapse">
-            <ul class="nav navbar-nav navbar-right" style="padding-right:100px;">
+            <ul class="nav navbar-nav navbar-right" style="padding-right:20px;">
                 {% if user.is_authenticated %}
                     {% if user.picture %}
                         <li><img style="height: 30px; display: inline-block; margin-right: 20px; margin-top: 20px; border-radius: 50%;" src="{{user.picture.url}}"></li>
