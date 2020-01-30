@@ -44,7 +44,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card">
                         <div class="header">
-                            <h2>Nuevo Gastos</h2>
+                            <h2>Nuevo Gastos Repetidos</h2>
                         </div>
                         <form action="." id="spenses" method="post" target="_parent" enctype='multipart/form-data'>
                             {% csrf_token %}
@@ -61,7 +61,7 @@
                                             </select>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Cantidad Bruto</label>
+                                            <label>Cantidad(€)</label>
                                             <input id="amount" name="amount" type="text" class="form-control" placeholder="Cantidad" required="True">
                                         </div>
                                     </div>
@@ -90,18 +90,17 @@
                                             <input id="date" name="date" required/>
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12"> 
-                                            <label>Total Neto Cantidad</label><br>
+                                            <label>Total Neto Cantidad(€)</label><br>
                                             <input id="real_amount" name="real_amount" class="form-control" disabled />
                                         </div>
-                                        
+                                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                            <label>Periodo de Repetición</label><br>
+                                            <input type="number" id="period" name="period" class="form-control" required min="1"/>
+                                        </div>
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <textarea id="description" name="description" type="text" class="form-control" placeholder="Note:" rows="10" class="w-100" ></textarea>
-                                        </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
-                                            <label>Periodo de Repetición</label><br>
-                                            <input type="number" id="period" name="period" class="form-control" min="0"/>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Factura</label>
@@ -110,9 +109,9 @@
                                                 <input type='file' class='custom-file-input' id='invoice' name='file'/>
                                             </div>
                                         </div>
-
                                     </div>
-                                    <input type="hidden" id="repeat_id" name="repeat_id" value="0" />
+
+                                    <input type="hidden" id="repeat" name="repeat" value="dddd"/>
                                     <input type="hidden" id="iva" name="iva" />
                                     <input type="hidden" id="category" name="category" />
                                     <input type="hidden" value="{{ user.id }}" name="user">
@@ -120,7 +119,7 @@
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">
                             <button id="submit" class="btn btn-primary waves-effect" type="submit">ACTUALIZAR</button>    
-                            <a class="btn btn-danger waves-effect" href="{% url 'spenses' %}">CANCELAR</a></center>
+                            <a class="btn btn-danger waves-effect" href="{% url 'repeats' %}">CANCELAR</a></center>
                         </div>
                         </form>
                     </div>

@@ -3,6 +3,7 @@
     {% load static %}
     <!-- Sweetalert Css -->
     <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+    <link href="{% static 'theme/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css' %}" rel="stylesheet"/>
 {% endblock %}
 {% block content %}
     <section class="content">
@@ -15,136 +16,87 @@
                         <h2 style="padding-top:12px;">PROOVEDOR</h2>
                     </div>
                     <div class="card" style="padding: 10px;">
-                        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" style="padding: 10px;">
-                            <input id="search_supplier" type="search" class="form-control" placeholder="Buscar">
-                        </div>
-                        <table class="table color-table primary-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col"></th>
-                                    <th scope="col">Nombre de Proovedor</th>
-                                    <th scope="col">Dirección</th>
-                                    <th scope="col">Teléfono</th>
-                                    <th scope="col">Sitio web</th>
-                                    <th scope="col">NIF</th>
-                                    <th scope="col">IVA</th>
-                                    <th scope="col">País</th>
-                                    <th scope="col">Note</th>
-                                    <th scope="col" class="text-center">Modificar</th>
-                                </tr>
-                            </thead>
-                            <tbody>	
-                            {% if suppliers %}	
+                        <div class="body">
+                            <table class="table color-table primary-table js-basic-example dataTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Nombre de Proovedor</th>
+                                        <th scope="col">Dirección</th>
+                                        <th scope="col">Teléfono</th>
+                                        <th scope="col">Sitio web</th>
+                                        <th scope="col">NIF</th>
+                                        <th scope="col">IVA</th>
+                                        <th scope="col">Tipo de IVA</th>
+                                        <th scope="col">Categorie</th>
+                                        <th scope="col">País</th>
+                                        <th scope="col">Note</th>
+                                        <th scope="col">Total</th>
+                                        <th scope="col" class="text-center">Modificar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>	
                                 {% for supplier in suppliers %}
-                                <tr class="text-left">
-                                    {% if supplier.picture %}
-                                        <td><img src="{{supplier.picture.url}}" draggable="false" width="35" height="35" style="border-radius:50%"></td>
-                                    {% else %}
-                                        <td><img id="supplier-img-reload" draggable="false" src="{% static 'images/default.png' %}" width="35" height="35" style="border-radius:50%" alt="" /></td>
-                                    {% endif %}
-                                    <td class="text-left">{{supplier.name}}</td>
-                                    <td class="text-left">{{supplier.address}}</td>
-                                    <td class="text-left">{{supplier.phone}}</td>
-                                    <td class="text-left">{{supplier.web}}</td>
-                                    <td class="text-left">{{supplier.nif}}</td>
-                                    <td class="text-left">{{supplier.iva.name}}</td>
-                                    <td class="text-left">{{supplier.country_supplier.name}}</td> 
-                                    <td class="text-left">{{supplier.description|truncatechars:10}}</td>                                   
-                                    <td class="text-center" style="vertical-align: middle">
-                                        <a href="{% url 'supplierupdate' supplier.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
-                                        <a href="#" data-toggle="modal" data-target="#delete-supplier{{supplier.id}}"><i class="fa fa-trash"></i></a>
-                                    </td>
-                                </tr>
-                                <!--Delete Supplier-->
-								<div class="modal fade" id="delete-supplier{{supplier.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-									<div class="modal-dialog modal-xs">
-										<div class="modal-content" style="border-radius: 15px;">
-											<div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
-												<div class="align-items-center">
-													<p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR PROOVEDOR</p>
-												</div>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true" style="color: #fff;">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<div class="col-12">
-													<h5>¿Está seguro que quiere eliminar este registro?</h5>
-												</div>
-											</div>
-											<div class="modal-footer">
-                                                <center>
-                                                    <button id="delete-button{{supplier.id}}" class="btn btn-primary waves-effect">SI</button>
-                                                    <button data-dismiss="modal" class="btn btn-danger waves-effect">NO</button>
-                                                </center>
-											</div>
-										</div>
-									</div>
-								</div>
-								<script>
-									$('#delete-button{{supplier.id}}').click(function(e){
-										var value = '{{supplier.id}}';
-										var url = '{% url "delete_supplier" %}';
-										var token = '{{csrf_token}}';
-										$.ajax({
-											headers: { "X-CSRFToken": token },
-											method: 'POST',
-											url: url,
-											data: {
-												'value': value
-											},
-											success: function(data) {
-												if(data == 'Ok') {
-													location.reload();
-												}
-											}
-										});
-									});
-								</script>
+                                    <tr class="text-left">
+                                        {% if supplier.picture %}
+                                            <td><img src="{{supplier.picture.url}}" draggable="false" width="35" height="35" style="border-radius:50%"></td>
+                                        {% else %}
+                                            <td><img id="supplier-img-reload" draggable="false" src="{% static 'images/default.png' %}" width="35" height="35" style="border-radius:50%" alt="" /></td>
+                                        {% endif %}
+                                        <td class="text-left">{{supplier.name}}</td>
+                                        <td class="text-left">{{supplier.address}}</td>
+                                        <td class="text-left">{{supplier.phone}}</td>
+                                        <td class="text-left">{{supplier.web}}</td>
+                                        <td class="text-left">{{supplier.nif}}</td>
+                                        <td class="text-left">{{supplier.iva.name}}</td>
+                                        <td class="text-left">{{supplier.vat_rate|default_if_none:"0"}}%</td>
+                                        <td class="text-left">{{supplier.category.name}}</td>
+                                        <td class="text-left">{{supplier.country_supplier.name}}</td> 
+                                        <td class="text-left">{{supplier.description|truncatechars:10}}</td>
+                                        <td class="text-left">{{supplier.sums_spense.amount__sum|default_if_none:""|floatformat:"2"}}</td>
+                                        <td class="text-center" style="vertical-align: middle">
+                                            <a href="{% url 'supplierupdate' supplier.id %}"><i class="fa fa-pencil"></i></a>&nbsp;
+                                            <a href="#" onclick="delete_supplier('{{supplier.id}}')"><i class="fa fa-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+    								<script>
+    									
+    								</script>
                                 {% endfor %}
-                            {% else %}
-                                <td style="padding-bottom:30px;">No existen Proovedor</td>
-							{% endif %}
-                            </tbody>
-                        </table>
-                        <script>
-                            $("#search_supplier").keyup(function(){
-                                _this = this;
-                                // Show only matching TR, hide rest of them
-                                $.each($("table tbody tr"), function() {
-                                    if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1){
-                                        $(this).hide();
-                                    }
-                                    else {
-                                        $(this).show();
-                                    }
-                                });
-                            });
-			            </script>
+                                
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    {% if suppliers.has_other_pages %}
-                        <center>
-                            <ul class="pagination text-center">
-                                {% if suppliers.has_previous %}
-                                    <li><a href="?page={{ suppliers.previous_page_number }}">&laquo;</a></li>
-                                {% else %}
-                                    <li class="disabled"><span>&laquo;</span></li>
-                                {% endif %}
-                                {% for i in suppliers.paginator.page_range %}
-                                    {% if suppliers.number == i %}
-                                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-                                    {% else %}
-                                        <li><a href="?page={{ i }}">{{ i }}</a></li>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if suppliers.has_next %}
-                                    <li><a href="?page={{ suppliers.next_page_number }}">&raquo;</a></li>
-                                {% else %}
-                                    <li class="disabled"><span>&raquo;</span></li>
-                                {% endif %}
-                            </ul>
-                        </center>
-                    {% endif %}
+                    
+                </div>
+            </div>
+            <!--Delete Supplier-->
+            <div class="modal fade" id="delete-supplier" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog modal-xs">
+                    <div class="modal-content" style="border-radius: 15px;">
+                        <div class="modal-header" style="background-color: #7f9bcd; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+                            <div class="align-items-center">
+                                <p class="modal-title" id="exampleModalLongTitle" style="color: white;"><i class="fa fa-trash"></i>&nbsp;&nbsp;ELIMINAR PROOVEDOR</p>
+                            </div>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true" style="color: #fff;">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="col-12">
+                                <h5>¿Está seguro que quiere eliminar este registro?</h5>
+                            </div>
+                        </div>
+                        <input type="hidden" id="supplier_id_sel" value="-1" />
+                        <div class="modal-footer">
+                            <center>
+                                <button id="delete-button" class="btn btn-primary waves-effect">SI</button>
+                                <button data-dismiss="modal" class="btn btn-danger waves-effect">NO</button>
+                            </center>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -153,4 +105,63 @@
 {% block script %}
     <!-- SweetAlert Plugin Js -->
     <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    <script src="{% static 'theme/plugins/jquery-datatable/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'theme/plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js' %}"></script>
+    <script >
+        $('.js-basic-example').DataTable({
+            responsive: true,
+            "columnDefs": [
+                { "width": "6%", "targets": 7 }
+              ],
+            "oLanguage": {
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla =(",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                },
+                "buttons": {
+                    "copy": "Copiar",
+                    "colvis": "Visibilidad"
+                }
+            }
+        });
+        function delete_supplier(id){
+            $("#supplier_id_sel").val(id);
+            $("#delete-supplier").modal();
+        }
+        $('#delete-button').click(function(e){
+            var value = $("#supplier_id_sel").val();
+            var url = '{% url "delete_supplier" %}';
+            var token = '{{csrf_token}}';
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                method: 'POST',
+                url: url,
+                data: {
+                    'value': value
+                },
+                success: function(data) {
+                    if(data == 'Ok') {
+                        location.reload();
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -26,14 +26,13 @@ SECRET_KEY = '120f1#u6jv!p=2u2kdg38b#uc)jt++!1wj!fpw$ip@r54d#aoj'
 DEBUG = True
 
 #ALLOWED_HOSTS = ["192.168.209.128"]
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["info-solucion.com", "www.info-solucion.com"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'cities_light',
-    'mathfilters',
     'System.part',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -123,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'es-es'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
@@ -149,5 +148,5 @@ LOGOUT_REDIRECT_URL = 'login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-#DECIMAL_SEPARATOR = ','
-USE_THOUSAND_SEPARATOR = False
+STATIC_ROOT = '/home/ijuiuq5ga2bh/public_html/LocalSystem/System/static'
+MEDIA_ROOT = '/home/ijuiuq5ga2bh/public_html/LocalSystem/System/media'

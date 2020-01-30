@@ -3,6 +3,7 @@
     {% load static %}
     <!-- Sweetalert Css -->
     <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+
     <style>
         .custom-file-input {
             position: relative;
@@ -32,8 +33,13 @@
             display: inline-block;
             width: 100%;
             height: calc(1.5em + .75rem + 2px);
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
+        .form-check-label{
+            font-size:14px !important;
+            font-weight: 700 !important;
+        }
+        
     </style>
 {% endblock %}
 {% block content %}
@@ -44,35 +50,27 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card">
                         <div class="header">
-                            <h2>Nuevo Gastos</h2>
+                            <h2>Actualizar Gastos Repetidos</h2>
                         </div>
-                        <form action="." id="spenses" method="post" target="_parent" enctype='multipart/form-data'>
+                        <form action="." id="spenses_update" method="POST" target="_parent" enctype='multipart/form-data'>
                             {% csrf_token %}
                             <div class="body" style="padding: 20px 60px">
                                 <div class="list-unstyled row clearfix">
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Empresa</label>
-                                            <select id="company" name='company' class="selectpicker form-control" data-live-search="true" required>
-                                                <option value="">----------------------------</option>
-                                                {% for company in companys %}
-                                                    <option value={{company.id}}>{{ company }}</option>
-                                                {% endfor %}
+                                            <select class="selectpicker form-control" data-live-search="true" {{form.company}}
                                             </select>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Cantidad Bruto</label>
-                                            <input id="amount" name="amount" type="text" class="form-control" placeholder="Cantidad" required="True">
+                                            {{form.amount}}
                                         </div>
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Proovedor</label>
-                                            <select id="supplier" name='supplier' class="selectpicker form-control" data-live-search="true" required>
-                                                <option value="">----------------------------</option>
-                                                {% for supplier in suppliers %}
-                                                    <option value={{supplier.id}}>{{ supplier }}</option>
-                                                {% endfor %}
+                                            <select id="supplier" class="selectpicker form-control" data-live-search="true" {{form.supplier}}
                                             </select>
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12"> 
@@ -83,44 +81,73 @@
                                             <label>&nbsp;</label><br>
                                             <input id="vat_amount" name="vat_amount" class="form-control" disabled />
                                         </div>
+                                        
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Fecha</label><br>
-                                            <input id="date" name="date" required/>
+                                            <input id="date" name="date" required {{form.date}}
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12"> 
-                                            <label>Total Neto Cantidad</label><br>
+                                            <label>Total Neto Cantidad(€)</label><br>
                                             <input id="real_amount" name="real_amount" class="form-control" disabled />
                                         </div>
                                         
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <textarea id="description" name="description" type="text" class="form-control" placeholder="Note:" rows="10" class="w-100" ></textarea>
+                                            <textarea class="form-control" {{form.description}}
+                                            </textarea>
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
                                             <label>Periodo de Repetición</label><br>
-                                            <input type="number" id="period" name="period" class="form-control" min="0"/>
+                                            <input id="period" name="period" class="form-control" min="1" required {{form.period}}
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Factura</label>
-                                            <div class="custom-file">
-                                                <label id="pdf-file-input" class="custom-file-label" for="file"><i class="fa fa-file"></i>&nbsp;&nbsp;Añadir Factura</label>
-                                                <input type='file' class='custom-file-input' id='invoice' name='file'/>
+                                            <div >
+                                                <label>Factura</label>
+                                                <div class="custom-file">
+                                                {% if file %}
+                                                    {% if file.file != "" %}
+                                                        <label id="pdf-file-input" class="custom-file-label" for="file">{{file.file|truncatechars:50}}</label>
+                                                        <input type='file' class='custom-file-input' id='invoice' name='file' />
+                                                    {% else %}
+                                                        <label id="pdf-file-input" class="custom-file-label" for="file"><i class="fa fa-file"></i>&nbsp;&nbsp;Añadir Factura</label>
+                                                        <input type='file' class='custom-file-input' id='invoice' name='file' />
+                                                    {% endif %}
+                                                {% else %}
+                                                    <label id="pdf-file-input" class="custom-file-label" for="file">Añadir Factura</label>
+                                                    <input type='file' class='custom-file-input' id='invoice' name='file' />
+                                                {% endif %}
+                                                </div>
                                             </div>
+                                            <!-- <div class="form-check" style="margin-top:30px;">
+                                              <input class="form-check-input" type="checkbox" value="" id="apply_all" name="apply_all"value="YES">
+                                              <label class="form-check-label" for="apply_all">
+                                                Aplicar datos ya registrados
+                                              </label>
+                                            </div> -->
                                         </div>
-
+                                    </div> 
+                                    <div class="col-lg-12" hidden>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
+                                            <label>IVA</label>
+                                            <select id="iva" class="form-control" {{form.iva}}
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
+                                            <label>Categorie</label>
+                                            <select id="category" class="form-control" {{form.category}}
+                                            </select>
+                                        </div>
                                     </div>
-                                    <input type="hidden" id="repeat_id" name="repeat_id" value="0" />
-                                    <input type="hidden" id="iva" name="iva" />
-                                    <input type="hidden" id="category" name="category" />
                                     <input type="hidden" value="{{ user.id }}" name="user">
+                                    <input type="hidden" value="{{form.instance.supplier.id}}" id="sup_id">
                                 </div>
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">
                             <button id="submit" class="btn btn-primary waves-effect" type="submit">ACTUALIZAR</button>    
-                            <a class="btn btn-danger waves-effect" href="{% url 'spenses' %}">CANCELAR</a></center>
+                            <a class="btn btn-danger waves-effect" href="{% url 'repeats' %}">CANCELAR</a></center>
                         </div>
                         </form>
                     </div>
@@ -130,13 +157,12 @@
     </section>
 {% endblock %}
 {% block script %}
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    <script src="{% static 'theme/plugins/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
     <script>
-        $('#spenses').submit(function() {
-          var amount_str = $('#amount').val();
-          $('#amount').val(amount_str.replace(',', '.'));
-        });
         $('#date').datepicker({
-            format: 'yyyy-mm-dd',
+            format: 'dd/mm/yyyy',
             });
         //Invoice
         $('#invoice').on('change', function(event){
@@ -152,14 +178,14 @@
                     .html(inputFile.files[0].name.substring(0,20)+'...');
             }
         });
+        
         var json_sup = '{{ suppliers_json|safe }}';
         json_sup = json_sup.replace(/\r/gi, "\\r").replace(/\n/gi, "\\n");
         json_sup = JSON.parse(json_sup);
-        $("#supplier").on("change", function(){
-            console.log(json_sup);
+        change_sup($("#sup_id").val());
+        function change_sup(supp_id){
             for(var k in json_sup) {
-                               
-                if(json_sup[k].pk == $("#supplier").val()){
+                if(json_sup[k].pk == supp_id){
                     $("#iva").val(json_sup[k].fields.iva);
                     $("#category").val(json_sup[k].fields.category);
                     if(json_sup[k].fields.vat_rate == null){
@@ -171,6 +197,9 @@
                     return;
                 }
             }
+        }
+        $("#supplier").on("change", function(){
+            change_sup($("#supplier").val());
 
         });
         $("#amount").on('keyup', function(){
@@ -188,6 +217,5 @@
             }
         }
     </script>
-    <!-- SweetAlert Plugin Js -->
-    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    
 {% endblock %}

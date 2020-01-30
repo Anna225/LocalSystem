@@ -1,7 +1,7 @@
 from django.db import models
 from cities_light.models import Country, City
 from django.contrib.auth.models import AbstractUser 
-# Create your models here.
+
 
 def invoice_file(instance, filename):
     return 'invoice/{1}'.format(instance, filename)
@@ -38,6 +38,11 @@ class IVA(models.Model):
 
     def __str__(self):
         return self.name
+class VAType(models.Model):
+    tax_rate = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.tax_rate
 
 class Supplier(models.Model):
     name = models.CharField(max_length=50, blank=True)
@@ -47,6 +52,8 @@ class Supplier(models.Model):
     nif = models.CharField(max_length=50, blank=True)
     country_supplier = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True)
+    vat_rate = models.IntegerField(blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
     picture = models.ImageField(upload_to=content_file_supplier, blank=True, null=True)
 
@@ -74,16 +81,33 @@ class Spenses(models.Model):
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
-    amount = models.CharField(max_length=30, blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date = models.DateField(null=True, blank=True)
     file = models.FileField(upload_to=invoice_file, blank=True, null=True)
     iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
     flag = models.IntegerField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    description = models.TextField(blank=True)
+    repeat_id = models.IntegerField(blank=True, null=True, default=0)
+    confirm_spense = models.IntegerField(blank=True, null=False, default=1)
 
     def __str__(self):
         return self.amount
+class Repeats(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    date = models.DateField(null=True, blank=True)
+    file = models.FileField(upload_to=invoice_file, blank=True, null=True)
+    iva = models.ForeignKey(IVA, on_delete=models.SET_NULL, blank=True, null=True)
+    flag = models.IntegerField(blank=True, null=True)
+    period = models.IntegerField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    description = models.TextField(blank=True)
 
+    def __str__(self):
+        return self.amount
 class Bank(models.Model):
     supplier_name = models.CharField(max_length=100, blank=True, null=True)
     date = models.DateField(null=True, blank=True)

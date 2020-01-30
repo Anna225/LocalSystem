@@ -7,6 +7,7 @@ from django.contrib.auth import views as auth_views
 from System.part import views as part_view
 from .views import companyadd, supplieradd, spensesadd, userlist, index, userinformation, userinformation_update, companylist, banklist, bankadd, bankdetail, bankupdate, category, categoryadd, categoryupdate, statistic
 from .views import companyupdate, supplierupdate, spensesupdate
+from .views import repeatsupdate
 
 from django.contrib.auth.views import PasswordResetView 
 from django.contrib.auth.views import PasswordResetDoneView
@@ -35,10 +36,17 @@ urlpatterns = [
     url(r'^supplieradd/$', supplieradd.as_view(), name='supplieradd'),
     url(r'^supplierupdate/(?P<pk>\d+)/$', supplierupdate.as_view(), name='supplierupdate'),
     url(r'^delete_supplier/$', part_view.delete_supplier, name='delete_supplier'),
+    
+    path('spensesnon/', part_view.spensesnon, name='spensesnon'),
     path('spenses/', part_view.spenses, name='spenses'),
     url(r'^spensesadd/$', spensesadd.as_view(), name='spensesadd'),
     url(r'^spensesupdate/(?P<pk>\d+)/$', spensesupdate.as_view(), name='spensesupdate'),
     url(r'^delete_spense/$', part_view.delete_spense, name='delete_spense'),
+    
+    path('repeats/', part_view.repeats, name='repeats'),
+    url(r'^repeatsupdate/(?P<pk>\d+)/$', repeatsupdate.as_view(), name='repeatsupdate'),
+    url(r'^delete_repeat/$', part_view.delete_repeat, name='delete_repeat'),
+
     path('category/', category.as_view(), name='category'),
     path('categoryadd/', categoryadd.as_view(), name='categoryadd'),
     url(r'^delete_category/$', part_view.delete_category, name='delete_category'),
@@ -60,8 +68,10 @@ urlpatterns = [
     url(r'^delete_bank/$', part_view.delete_bank, name='delete_bank'),
     url(r'^bank_update/(?P<pk>\d+)/$', bankupdate.as_view(), name='bankupdate'),
     url(r'^statistic/$', statistic.as_view(), name='statistic'),
-    
-    
+    url(r'^ajax/stat_category$', part_view.get_stat_category, name='ajax_stat_category'),
+    url(r'^ajax/confirm_spense$', part_view.confirm_spense, name='ajax_confirm_spense'),
+    url(r'^ajax/cancel_spense$', part_view.cancel_spense, name='ajax_cancel_spense'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

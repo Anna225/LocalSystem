@@ -3,9 +3,10 @@
     {% load static %}
     <!-- Sweetalert Css -->
     <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+    
     <style>
         .foto-img img {
-            width: auto;
+            width: 99%;
             max-height: 99%;
             border-radius: 5px;
         }
@@ -47,7 +48,7 @@
             display: inline-block;
             width: 100%;
             height: calc(1.5em + .75rem + 2px);
-            margin-bottom: 0;
+            margin-bottom: 20px;
         }
         
     </style>
@@ -89,7 +90,7 @@
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>País</label>
-                                            <select id="country_supplier" name='country_supplier' class="form-control" required>
+                                            <select id="country_supplier" name='country_supplier' class="selectpicker form-control" data-live-search="true" required>
                                                 <option value="">----------------------------</option>
                                                 {% for country in countrys %}
                                                     <option value={{country.id}}>{{ country }}</option>
@@ -98,11 +99,20 @@
                                         </div>
                                         
                                         <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"> 
-                                            <textarea id="description" name="description" type="text" class="form-control" placeholder="Note:" rows="10" class="w-100" required="True"></textarea>
+                                            <textarea id="description" name="description" type="text" class="form-control" placeholder="Note:" rows="10" class="w-100" ></textarea>
                                         </div>
                                     </div>
                                     
                                     <div class="col-lg-6">
+                                        <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"> 
+                                            <label>Categorie</label>
+                                            <select id="category" name='category' class="selectpicker form-control" data-live-search="true" required>
+                                                <option value="">----------------------------</option>
+                                                {% for category in categorys %}
+                                                    <option value={{category.id}}>{{ category }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                         <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>IVA</label>
                                             <select id="iva" name='iva' class="form-control" required>
@@ -119,11 +129,19 @@
                                                 <img id="supplier-img-reload" src="" alt="">
                                             </div>
 						                </div>
-                                        <div class="custom-file">
+
+                                        <div class="custom-file col-12 ">
                                             <input type="file" class="custom-file-input" id="imagen" onchange="readURL(this);" name="picture">
                                             <label id="image-file" class="custom-file-label" for="supplier-img"><i class="material-icons" style="vertical-align:middle;">image</i>Añadir imagen</label>
                                         </div>
-                                        
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
+                                            <label>Tipo de IVA</label>
+                                            <select id="vat_rate" name='vat_rate' class="form-control" required>
+                                                {% for tax_rate in tax_rates %}
+                                                    <option value={{tax_rate.tax_rate}}>{{ tax_rate.tax_rate }}%</option>
+                                                {% endfor %} 
+                                            </select>
+                                        </div>
                                     </div>   
                                 </div>
                             </div>                 
@@ -139,17 +157,20 @@
     </section>
 {% endblock %}
 {% block script %}
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    
     <script>
         function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#supplier-img-reload')
-                    .attr('src', e.target.result);
-            };
-            reader.readAsDataURL(input.files[0]);
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#supplier-img-reload')
+                        .attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
-    }
         //Picture
         $('#imagen').on('change', function(event) {
             var inputFile = event.currentTarget;
@@ -164,7 +185,7 @@
                     .html(inputFile.files[0].name.substring(0,20)+'...');
             }
         });
+        $('#category').selectpicker();
     </script>
-    <!-- SweetAlert Plugin Js -->
-    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    
 {% endblock %}

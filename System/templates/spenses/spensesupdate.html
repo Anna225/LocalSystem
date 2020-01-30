@@ -3,6 +3,7 @@
     {% load static %}
     <!-- Sweetalert Css -->
     <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+
     <style>
         .custom-file-input {
             position: relative;
@@ -34,6 +35,7 @@
             height: calc(1.5em + .75rem + 2px);
             margin-bottom: 0;
         }
+        
     </style>
 {% endblock %}
 {% block content %}
@@ -53,30 +55,44 @@
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Empresa</label>
-                                            <select class="form-control" {{form.company}}
+                                            <select class="selectpicker form-control" data-live-search="true" {{form.company}}
                                             </select>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Cantidad</label>
+                                            <label>Cantidad Bruto</label>
                                             {{form.amount}}
                                         </div>
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Categorie</label>
-                                            <select class="form-control" {{form.category}}
+                                            <label>Proovedor</label>
+                                            <select id="supplier" class="selectpicker form-control" data-live-search="true" {{form.supplier}}
                                             </select>
                                         </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12"> 
+                                            <label>Tipo de IVA</label><br>
+                                            <input id="vat_rate" name="vat_rate" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12"> 
+                                            <label>&nbsp;</label><br>
+                                            <input id="vat_amount" name="vat_amount" class="form-control" disabled />
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Fecha</label><br>
                                             <input id="date" name="date" required {{form.date}}
                                         </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12"> 
+                                            <label>Total Neto Cantidad(€)</label><br>
+                                            <input id="real_amount" name="real_amount" class="form-control" disabled />
+                                        </div>
                                     </div>
                                     <div class="col-lg-12">
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
-                                            <label>Proovedor</label>
-                                            <select class="form-control" {{form.supplier}}
-                                            </select>
+                                            <textarea class="form-control" {{form.description}}
+                                            </textarea>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>Factura</label>
@@ -96,14 +112,20 @@
                                             </div>
                                         </div>
                                     </div> 
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-12" hidden>
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
                                             <label>IVA</label>
-                                            <select class="form-control" {{form.iva}}
+                                            <select id="iva" class="form-control" {{form.iva}}
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
+                                            <label>Categorie</label>
+                                            <select id="category" class="form-control" {{form.category}}
                                             </select>
                                         </div>
                                     </div>
                                     <input type="hidden" value="{{ user.id }}" name="user">
+                                    <input type="hidden" value="{{form.instance.supplier.id}}" id="sup_id">
                                 </div>
                             </div>                 
                         <div class="col-12" style="text-align: center; padding-bottom: 50px;">
@@ -118,9 +140,12 @@
     </section>
 {% endblock %}
 {% block script %}
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    <script src="{% static 'theme/plugins/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
     <script>
         $('#date').datepicker({
-            format: 'yyyy-mm-dd',
+            format: 'dd/mm/yyyy',
             });
         //Invoice
         $('#invoice').on('change', function(event){
@@ -136,7 +161,44 @@
                     .html(inputFile.files[0].name.substring(0,20)+'...');
             }
         });
+        
+        var json_sup = '{{ suppliers_json|safe }}';
+        json_sup = json_sup.replace(/\r/gi, "\\r").replace(/\n/gi, "\\n");
+        json_sup = JSON.parse(json_sup);
+        change_sup($("#sup_id").val());
+        function change_sup(supp_id){
+            for(var k in json_sup) {
+                if(json_sup[k].pk == supp_id){
+                    $("#iva").val(json_sup[k].fields.iva);
+                    $("#category").val(json_sup[k].fields.category);
+                    if(json_sup[k].fields.vat_rate == null){
+                        $("#vat_rate").val(0 +"%");
+                    }else{
+                        $("#vat_rate").val(json_sup[k].fields.vat_rate + "%");
+                    }
+                    cal_real_amount();
+                    return;
+                }
+            }
+        }
+        $("#supplier").on("change", function(){
+            change_sup($("#supplier").val());
+
+        });
+        $("#amount").on('keyup', function(){
+            cal_real_amount();
+        });
+        function cal_real_amount(){
+            var amount_str = $('#amount').val().replace(",", ".");
+            var tax_rate = $("#vat_rate").val().replace("%", "");
+            if(tax_rate != "" && amount_str != "" && !isNaN(parseFloat(amount_str)) && isFinite(amount_str)){
+                var vat_amount = parseInt(tax_rate) * parseFloat(amount_str)/100;
+                vat_amount = vat_amount.toFixed(2);
+                var real_amount = parseFloat(amount_str) - vat_amount;
+                $("#vat_amount").val(vat_amount);
+                $("#real_amount").val(real_amount.toFixed(2));
+            }
+        }
     </script>
-    <!-- SweetAlert Plugin Js -->
-    <script src="{% static 'theme/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    
 {% endblock %}

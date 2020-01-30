@@ -1,7 +1,9 @@
 from django import forms
-from System.part.models import Company, Supplier, Spenses, Bank, Category
+from System.part.models import Company, Supplier, Spenses, Bank, Category, Repeats
 from cities_light.models import Country
 from System.part.models import User
+import django
+
 
 class CompanyForm(forms.ModelForm):
     class Meta:
@@ -37,8 +39,10 @@ class SupplierForm(forms.ModelForm):
             'nif',
             'description',
             'country_supplier',
+            'category',
             'iva',
-            'picture'
+            'picture',
+            'vat_rate'
         )
         widgets = {
             'name': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'name', 'id':'name', 'required':True}),
@@ -53,7 +57,18 @@ class SupplierForm(forms.ModelForm):
 class SpensesForm(forms.ModelForm):
     class Meta:
         model = Spenses
-        fields = ('amount', 'date', 'company', 'supplier','category', 'file', 'iva', 'user')
+        localized_fields = ('amount',)
+        fields = ('amount', 'date', 'company', 'supplier','category', 'file', 'iva', 'user','description')
+        widgets = {
+            'amount': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'amount', 'id':'amount', 'required':True}),
+            'file': forms.FileInput(attrs={'class':'custom-file-input'}),
+        }
+
+class RepeatsForm(forms.ModelForm):
+    class Meta:
+        model = Repeats
+        localized_fields = ('amount',)
+        fields = ('amount', 'date', 'company', 'supplier','category', 'file', 'iva', 'user','description', 'period')
         widgets = {
             'amount': forms.TextInput(attrs={'type':'text', 'class':'form-control', 'name':'amount', 'id':'amount', 'required':True}),
             'file': forms.FileInput(attrs={'class':'custom-file-input'}),

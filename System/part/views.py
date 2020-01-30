@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from System.part.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from System.part.models import Company, Supplier, Spenses, IVA, Bank, BankData, Category
+from System.part.models import Company, Supplier, Spenses, IVA, Bank, BankData, Category, VAType, Repeats
 from cities_light.models import Country
 import os
 
@@ -13,17 +13,23 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView, TemplateView
 from django.utils.decorators import method_decorator
 from django.urls import reverse, reverse_lazy
-from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm, BankForm, CategoryForm
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
 
-from datetime import datetime
+from System.part.forms import CompanyForm, SupplierForm, SpensesForm, UserForm, BankForm, CategoryForm, RepeatsForm
+
+from datetime import datetime, timedelta
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import FormView, RedirectView
 
 import pandas as pd
-from django.db.models import Sum, Count
-
+from django.db.models import FloatField, F, Sum, Count, Q
+from decimal import Decimal
+from django.http import JsonResponse
+import json
 # Create your views here.
 
 def home(request):
@@ -118,10 +124,7 @@ class companylist(ListView):
     def get_context_data(self, **kwargs):
         context = super(companylist, self).get_context_data(**kwargs)
         company = Company.objects.all().order_by('name')
-        paginator = Paginator(company, 10)
-        page = self.request.GET.get('page')
-        page_obj = paginator.get_page(page)
-        context["companies"] = page_obj
+        context["companies"] = company
 
         return context
 
@@ -175,15 +178,9 @@ class companyupdate(UpdateView):
 @login_required
 def supplier(request):
     supplier_data = Supplier.objects.all().order_by('name')
-    page = request.GET.get('page', 1)
-    paginator = Paginator(supplier_data, 10)
-    try:
-        supplier = paginator.page(page)
-    except PageNotAnInteger:
-        supplier = paginator.page(1)
-    except EmptyPage:
-        supplier = paginator.page(paginator.num_pages)
-    return render(request, 'supplier/supplier.html', {'suppliers':supplier})
+    for data in supplier_data:
+        data.sums_spense = Spenses.objects.filter(supplier_id=data.id).aggregate(Sum("amount"))
+    return render(request, 'supplier/supplier.html', {'suppliers':supplier_data})
 
 def delete_supplier(request):
     my_id = request.POST.get('value')
@@ -227,35 +224,16 @@ class supplieradd(CreateView):
     def get_context_data(self, **kwargs):
         context = super(supplieradd, self).get_context_data(**kwargs)
         country = Country.objects.all()
+        category = Category.objects.all()
         iva = IVA.objects.all()
+        tax_rate = VAType.objects.all()
+
+        context["categorys"] = category
         context["countrys"] = country
         context["ivas"] = iva
+        context["tax_rates"] = tax_rate
         return context
-    '''
-    def post(self, request, *args, **kwargs):
-        if request.method == 'POST':
-            name = request.POST.get('name')
-            phone = request.POST.get('phone')
-            address = request.POST.get('address')
-            web = request.POST.get('web')
-            nif = request.POST.get('nif')
-            countries = request.POST.get('country')
-            description = request.POST.get('description')
-            iva = request.POST.get('iva')
-            supplier = Supplier(
-                name = name,
-                phone = phone,
-                address = address,
-                web=web,
-                nif=nif,
-                country_supplier_id=countries,
-                description=description,
-                iva_id=iva,
-            )
-            supplier.save()
-        
-        return redirect('supplier')
-    '''
+    
 @method_decorator(login_required, name='dispatch')
 class supplierupdate(UpdateView):
     model = Supplier
@@ -266,29 +244,59 @@ class supplierupdate(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['supplier'] = Supplier.objects.get(pk=self.kwargs.get('pk'))
+        context["tax_rates"] = VAType.objects.all()
         return context
 
 @login_required
 def spenses(request):
-    #if request.user.is_staff == True:
-       # spenses = Spenses.objects.all().order_by('date')
-    #else:
-    spenses = Spenses.objects.filter(user_id=request.user.id).order_by('date')
-    sums_spense = Spenses.objects.filter(user_id=request.user.id).aggregate(Sum("amount"))
-    page = request.GET.get('page', 1)
-    paginator = Paginator(spenses, 10)
-    try:
-        spense_page = paginator.page(page)
-    except PageNotAnInteger:
-        spense_page = paginator.page(1)
-    except EmptyPage:
-        spense_page = paginator.page(paginator.num_pages)
-    return render(request, 'spenses/spenses.html', {'spense_page':spense_page, 'sums_spense':sums_spense})
+    #insert repeated gasto automatically
+    today = datetime.today()
+    repeats = Repeats.objects.filter(user_id=request.user.id, date__lt=today)
+    for repeat in repeats:
+        repeated_date = repeat.date + timedelta(days=repeat.period)
+        last_date = repeated_date + timedelta(days=-1)
+        
+        if Spenses.objects.filter(user_id=request.user.id, repeat_id=repeat.id).count() > 0:
+            last_date = Spenses.objects.filter(user_id=request.user.id, repeat_id=repeat.id).latest('date').date
+        while repeated_date <= today.date() and repeated_date > last_date:
+            Spenses.objects.get_or_create(company=repeat.company, supplier=repeat.supplier, category=repeat.category, amount=repeat.amount, repeat_id=repeat.pk, confirm_spense=2,
+            date=repeated_date, file=repeat.file, iva=repeat.iva, flag=repeat.flag, user=repeat.user, description=repeat.description)
+            repeated_date += timedelta(days=repeat.period)
+
+    spenses = Spenses.objects.filter(Q(user_id=request.user.id) & ~Q(confirm_spense=0)).order_by('date')
+    sums_spense = Spenses.objects.filter(user_id=request.user.id, confirm_spense=1).aggregate(Sum("amount"))
+    sums_tax = Spenses.objects.filter(user_id=request.user.id, confirm_spense=1).aggregate(
+        sum_tax=Sum(F('amount') * F('supplier__vat_rate')/100.0, output_field=FloatField())
+        )
+    return render(request, 'spenses/spenses.html', {'spense_page':spenses, 'sums_spense':sums_spense,'sums_tax':sums_tax, 'page_1':'total'})
+
+@login_required
+def spensesnon(request):
+    spenses = Spenses.objects.filter(Q(user_id=request.user.id) & Q(confirm_spense=1) & ~Q(repeat_id__gt=0)).order_by('date')
+    sums_spense = Spenses.objects.filter(Q(user_id=request.user.id) & Q(confirm_spense=1) & ~Q(repeat_id__gt=0)).aggregate(Sum("amount"))
+    sums_tax = Spenses.objects.filter(Q(user_id=request.user.id) & Q(confirm_spense=1) & ~Q(repeat_id__gt=0)).aggregate(
+        sum_tax=Sum(F('amount') * F('supplier__vat_rate')/100.0, output_field=FloatField())
+        )
+    return render(request, 'spenses/spenses.html', {'spense_page':spenses, 'sums_spense':sums_spense,'sums_tax':sums_tax, 'page_1':'non'})
 
 def delete_spense(request):
     my_id = request.POST.get('value')
     spenses = Spenses.objects.get(id=my_id)
     spenses.delete()
+    return HttpResponse('Ok')
+
+def confirm_spense(request):
+    my_id = request.POST.get('value')
+    spenses = Spenses.objects.get(id=my_id)
+    spenses.confirm_spense = 1
+    spenses.save()
+    return HttpResponse('Ok')
+
+def cancel_spense(request):
+    my_id = request.POST.get('value')
+    spenses = Spenses.objects.get(id=my_id)
+    spenses.confirm_spense = 0
+    spenses.save()
     return HttpResponse('Ok')
 
 @method_decorator(login_required, name='dispatch')
@@ -309,8 +317,35 @@ class spensesadd(CreateView):
         context["suppliers"] = supplier
         context["categorys"] = category
         context["ivas"] = iva
+        
+        context["suppliers_json"] = serialize('json', supplier, cls=DjangoJSONEncoder)
         return context
+    def form_valid(self, form):
+        return super().form_valid(form)
 
+    def get_success_url(self):
+        period = self.request.POST.get('period')
+        if len(period) > 0:
+            repeat = Repeats.objects.create(company=self.object.company, supplier=self.object.supplier, category=self.object.category, amount=self.object.amount, period=period,
+                date=self.object.date, file=self.object.file, iva=self.object.iva, flag=self.object.flag, user=self.object.user, description=self.object.description)
+            # insert only this date spense table
+            spense1 = Spenses.objects.get(id=self.object.pk)
+            spense1.repeat_id = repeat.id
+            spense1.confirm_spense = 2
+            spense1.save()
+
+            # insert all date less than current date
+            today = datetime.today()
+            repeat = Repeats.objects.get(id=repeat.id)
+            repeated_date = repeat.date + timedelta(days=repeat.period)
+            while repeated_date < today.date():
+                Spenses.objects.get_or_create(company=repeat.company, supplier=repeat.supplier, category=repeat.category, amount=repeat.amount, repeat_id=repeat.pk, confirm_spense=2,
+                date=repeated_date, file=repeat.file, iva=repeat.iva, flag=repeat.flag, user=repeat.user, description=repeat.description)
+                
+                repeated_date += timedelta(days=repeat.period)
+ 
+            
+        return self.success_url
 @method_decorator(login_required, name='dispatch')
 class spensesupdate(UpdateView):
     model = Spenses
@@ -320,9 +355,68 @@ class spensesupdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        supplier = Supplier.objects.all()
+        context["suppliers_json"] = serialize('json', supplier, cls=DjangoJSONEncoder)
         context['file'] = Spenses.objects.get(pk=self.kwargs.get('pk'))
         return context
 
+@login_required
+def repeats(request):
+    spenses = Repeats.objects.filter(user_id=request.user.id).order_by('date')
+    sums_spense = Repeats.objects.filter(user_id=request.user.id).aggregate(Sum("amount"))
+
+    sums_tax = Spenses.objects.filter(Q(user_id=request.user.id) & ~Q(repeat_id__isnull=True) & ~Q(repeat_id__exact = 0)& Q(confirm_spense = 1)).aggregate(
+        sum_tax=Sum(F('amount') * F('supplier__vat_rate')/100.0, output_field=FloatField())
+        )
+    total_repeated_spense = Spenses.objects.filter(Q(user_id=request.user.id) & ~Q(repeat_id__isnull=True) & ~Q(repeat_id__exact = 0) & Q(confirm_spense = 1)).aggregate(Sum("amount"))
+    for data in spenses:
+        query = Spenses.objects.filter(Q(user_id=request.user.id) & Q(repeat_id=data.id) & Q(confirm_spense = 1))
+        temp = query.aggregate(Sum("amount"))
+        count = query.count()
+        if temp["amount__sum"] is None:
+            data.total_spense = 0
+            data.count = 0
+        else:
+            data.total_spense = temp["amount__sum"]
+            data.count = count
+    return render(request, 'repeats/repeats.html', {'spense_page':spenses, 'sums_spense':sums_spense,'sums_tax':sums_tax, 'total_repeated_spense':total_repeated_spense})
+
+def delete_repeat(request):
+    my_id = request.POST.get('value')
+    spenses = Repeats.objects.get(id=my_id)
+    spenses.delete()
+    return HttpResponse('Ok')
+
+
+@method_decorator(login_required, name='dispatch')
+class repeatsupdate(UpdateView):
+    model = Repeats
+    form_class = RepeatsForm
+    template_name = "repeats/repeatsupdate.html"
+    success_url = reverse_lazy('repeats')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        supplier = Supplier.objects.all()
+        context["suppliers_json"] = serialize('json', supplier, cls=DjangoJSONEncoder)
+        context['file'] = Repeats.objects.get(pk=self.kwargs.get('pk'))
+        return context
+    def get_success_url(self):
+        print("#######", self.object.pk)
+        # if len(self.request.POST.getlist('apply_all')) > 0:
+        #     # apply this repeated id data to spenses table (delete)
+        #     # delete this repeated_id
+        #     Spenses.objects.filter(repeat_id=self.object.pk, user_id=self.request.user.id).delete()
+        #     # insert auto repeated data
+        #     today = datetime.today()
+        #     repeats = Repeats.objects.filter(user_id=self.request.user.id, date__lt=today)
+        #     for repeat in repeats:
+        #         repeated_date = repeat.date + timedelta(days=repeat.period)
+        #         while repeated_date < today.date():
+        #             Spenses.objects.get_or_create(company=repeat.company, supplier=repeat.supplier, category=repeat.category, amount=repeat.amount, repeat_id=repeat.pk,
+        #             date=repeated_date, file=repeat.file, iva=repeat.iva, flag=repeat.flag, user=repeat.user, description=repeat.description)
+        #             repeated_date += timedelta(days=repeat.period)
+        return self.success_url
 @method_decorator(login_required, name='dispatch')
 class category(ListView):
     model = Category
@@ -392,11 +486,7 @@ class banklist(ListView):
     def get_context_data(self, **kwargs):
         context = super(banklist, self).get_context_data(**kwargs)
         bank = Bank.objects.filter(user_id=self.request.user.pk).order_by('date')
-        paginator = Paginator(bank, 10)
-        page = self.request.GET.get('page')
-        page_obj = paginator.get_page(page)
-        context["banks"] = page_obj
-
+        context["banks"] = bank
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -523,29 +613,86 @@ class statistic(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        statistics_spense = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).count()
+        category = Category.objects.all()
+        context["categorys"] = category
+        sums_iva = Spenses.objects.filter(user_id=self.request.user.pk, confirm_spense=1).aggregate(
+        sum_iva=Sum(F('amount') * F('supplier__vat_rate')/100.0, output_field=FloatField())
+        )
+        context["sums_iva"] = sums_iva
+
+        statistics_spense = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, confirm_spense=1).count()
         #print("===============", self.request.user.pk)
         if statistics_spense != 0:
+            sums_spense = Spenses.objects.filter(user_id=self.request.user.pk, confirm_spense=1).aggregate(Sum("amount"))
+            sum = abs(sums_spense["amount__sum"])
 
-            statis = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(category_id__isnull=True).values('category').annotate(dsum=Sum('amount')).order_by('-dsum')
+            statis = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, confirm_spense=1).exclude(category_id__isnull=True).values('category').annotate(dsum=Sum('amount')).order_by('-dsum')
             array = [[]]
             array.clear()
             head = ['Category', 'Sum']
             array.append(head)
-            sum = 0
             for stat in statis:
                 temp = []
                 category_name = Category.objects.get(pk=stat['category'])
-                temp.append(str(category_name))
-                temp.append(abs(stat['dsum']))
+                percent_val = float(abs(stat['dsum'])) / float(sum) * 100
+                temp.append((str(category_name) + " %.1f" % percent_val +"%").replace(".", ","))
+                temp.append(float(abs(stat['dsum'])))
                 array.append(temp)
-                sum += abs(stat['dsum'])
-
             context["statistics_spenses"] = array
             context["sum"] = sum
 
-            statistic_invoice = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(file__exact="").count()
-            statistic_invoice_empty = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, file__exact="").count()
+            statis_company = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, confirm_spense=1).exclude(company_id__isnull=True).values('company').annotate(dsum=Sum('amount')).order_by('-dsum')
+            array_company = [[]]
+            array_company.clear()
+            array_benefit = [[]]
+            array_benefit.clear()
+            head = ['Company', 'Sum']
+            array_company.append(head)
+            for stat in statis_company:
+                temp = []
+                tmp_benefit = []
+                category_name = Company.objects.get(pk=stat['company'])
+                percent_val = float(abs(stat['dsum'])) / float(sum) * 100
+
+                temp.append((str(category_name) + " %.1f" % percent_val +"%").replace(".", ","));
+                temp.append(float(abs(stat['dsum'])))
+                array_company.append(temp)
+
+                sums_material = Spenses.objects.filter(user_id=self.request.user.pk, company_id=stat['company'], category_id=6, confirm_spense=1).aggregate(Sum("amount"))
+                sums_iva_comp = Spenses.objects.filter(user_id=self.request.user.pk, company_id=stat['company'], confirm_spense=1).aggregate(sum_iva=Sum(F('amount') * F('supplier__vat_rate')/100.0, output_field=FloatField()))
+                tmp_benefit.append(stat['company'])
+                tmp_benefit.append(str(category_name))
+                tmp_benefit.append(float(abs(stat['dsum'])))
+                if sums_material['amount__sum'] is not None:
+                    tmp_benefit.append(float(abs(sums_material['amount__sum'])))
+                else:
+                    tmp_benefit.append(float(abs(0)))
+                if sums_iva_comp['sum_iva'] is not None:
+                    tmp_benefit.append(float(abs(sums_iva_comp['sum_iva'])))
+                else:
+                    tmp_benefit.append(float(abs(0)))
+                array_benefit.append(tmp_benefit)
+
+            context["statistics_company_spenses"] = array_company   
+            context["statistic_benefit"] = array_benefit
+
+            statis_tax = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, confirm_spense=1).exclude(category_id__isnull=True).values('iva').annotate(dsum=Sum('amount')).order_by('-dsum')
+            array_tax = [[]]
+            array_tax.clear()
+            head = ['IVA', 'Sum']
+            array_tax.append(head)
+            for stat in statis_tax:
+                temp = []
+                iva_name = IVA.objects.get(pk=stat['iva'])
+                percent_val = float(abs(stat['dsum'])) / float(sum) * 100
+                temp.append((str(iva_name) + " %.1f" % percent_val +"%").replace(".", ","))
+                temp.append(float(abs(stat['dsum'])))
+                array_tax.append(temp)
+
+            context["statistic_taxs"] = array_tax
+
+            statistic_invoice = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, confirm_spense=1).exclude(file__exact="").count()
+            statistic_invoice_empty = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0, file__exact="", confirm_spense=1).count()
             invoice_head = ["Invoice", "Count"]
             invoice_temp = []
             invoice_temp.append("Factura")
@@ -563,32 +710,27 @@ class statistic(TemplateView):
         else:
             array = [[]]
             sum = 0
-            invoice_array = [[]]
             context["statistics_spenses"] = array
+            context["statistics_company_spenses"] = array
             context["sum"] = sum
-            context["invoice"] = invoice_array
-
-        statistic_tax = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).count()
-        if statistic_tax != 0:
-
-            statis = Spenses.objects.filter(user_id=self.request.user.pk, amount__lt=0).exclude(category_id__isnull=True).values('iva').annotate(dsum=Sum('amount')).order_by('-dsum')
-            array = [[]]
-            array.clear()
-            head = ['IVA', 'Sum']
-            array.append(head)
-            for stat in statis:
-                temp = []
-                iva_name = IVA.objects.get(pk=stat['iva'])
-                temp.append(str(iva_name))
-                temp.append(abs(stat['dsum']))
-                array.append(temp)
-
+            context["invoice"] = array
             context["statistic_taxs"] = array
+            context["statistic_benefit"] = array
 
-        else:
-            array = [[]]
-            context["statistic_taxs"] = array
-        
+        # insert repeated data automatically
+        today = datetime.today()
+        repeats = Repeats.objects.filter(user_id=self.request.user.id, date__lt=today)
+        for repeat in repeats:
+            repeated_date = repeat.date + timedelta(days=repeat.period)
+            last_date = repeated_date + timedelta(days=-1)
+            if Spenses.objects.filter(user_id=self.request.user.id, repeat_id=repeat.id).count() > 0:
+                last_date = Spenses.objects.filter(user_id=self.request.user.id, repeat_id=repeat.id).latest('date').date
+            
+            while repeated_date <= today.date() and repeated_date > last_date:
+                Spenses.objects.get_or_create(company=repeat.company, supplier=repeat.supplier, category=repeat.category, amount=repeat.amount, repeat_id=repeat.pk, confirm_spense=2,
+                date=repeated_date, file=repeat.file, iva=repeat.iva, flag=repeat.flag, user=repeat.user, description=repeat.description)
+                repeated_date += timedelta(days=repeat.period)
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -615,7 +757,38 @@ class statistic(TemplateView):
             else:
                 array = [[]]
                 return render(request, 'statistic/statistic.html', {'statistics': array,'start':start, 'end':end})
+def get_stat_category(request):
+    category_id = request.POST.get('category_id', None)
+    user_id = request.POST.get('user_id', None)
+    sums_spense = Spenses.objects.filter(user_id=user_id, category_id=category_id, confirm_spense=1).aggregate(Sum("amount"))
 
+    if sums_spense["amount__sum"] is not None:
+        sum_spense = abs(sums_spense["amount__sum"])
+        statis_company = Spenses.objects.filter(user_id=user_id, category_id=category_id, amount__lt=0, confirm_spense=1).exclude(company_id__isnull=True).values('company').annotate(dsum=Sum('amount')).order_by('-dsum')
+        array_company = [[]]
+        array_company.clear()
+        head = ['Company', 'Sum']
+        array_company.append(head)
+        for stat in statis_company:
+            temp = []
+            category_name = Company.objects.get(pk=stat['company'])
+            percent_val = float(abs(stat['dsum'])) / float(sum_spense) * 100
+            temp.append((str(category_name) + " %.1f" % percent_val +"%").replace(".", "."))
+            temp.append(float(abs(stat['dsum'])))
+            array_company.append(temp)
+         
+        data = {
+            "category_company": json.dumps(array_company),
+            "sum": sum_spense
+        }
+        return JsonResponse(data)
+    else:
+        data = {
+            "category_company": json.dumps([[]]),
+            "sum": 0
+        }
+    
+    return JsonResponse(data)
 
 def handler404(request, exception):
     return render(request, '404.html', status=404)

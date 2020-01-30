@@ -33,12 +33,21 @@
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
     <link href="{% static 'theme/css/themes/all-themes.css' %}" rel="stylesheet" />
     <link href="{% static 'theme/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet" />
+    <link href="{% static 'theme/plugins/bootstrap-select/css/bootstrap-select.min.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/gijgo.min.css' %}">
+
     <!-- Jquery Core Js -->
     <script src="{% static 'theme/plugins/jquery/jquery.min.js' %}"></script>
     <!-- Bootstrap Core Js -->
     <script src="{% static 'theme/plugins/bootstrap/js/bootstrap.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/gijgo.min.css' %}">
+    <script src="{% static 'theme/plugins/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'js/gijgo.min.js' %}" type="text/javascript"></script> 
+    <style>
+        .bootstrap-select .btn {
+          font-size: 14px !important;
+        }
+    </style>
+
 </head>
 
 <!-- Theme Color -->
@@ -124,7 +133,7 @@
                         <span>Categorie</span>
                     </a>
                 </li>
-                <li class="{% if 'spenses' in request.path %}active{% endif %}">
+                <li class="{% if 'spenses' in request.path or 'repeats' in request.path %}active{% endif %}">
                     <a href="{% url 'spenses' %}"><i class="material-icons">shopping_cart</i>
                         <span>Gastos</span>
                     </a>
